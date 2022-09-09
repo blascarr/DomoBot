@@ -1,7 +1,14 @@
-#include "config.h"
-
 #include <Ticker.h>
 #include <Arduino_JSON.h>
+
+#include "config.h"
+
+#include "Motor_Controller.h" 
+#include "PID_Controller.h"
+#include "IMU_Controller.h"
+
+#include "Domobot_Controller.h" 
+#include "Bot_Config.h" 
 
 #include "OTA_Controller.h"
 #include "Server_Controller.h"
@@ -9,14 +16,6 @@
 #include "Wifi_Controller.h" 
 #include "WifiEvents_Controller.h"
  
-#include "Motor_Controller.h" 
-#include "PID_Controller.h"
-
-#include "OPT_Controller.h" 
-#include "MPU6050_Controller.h" 
-
-#include "Domobot_Controller.h" 
-DomoBot bot( 1000 );
 
 void setup() {
   Serial.begin(115200);   //Serial para debug en el PC
@@ -35,25 +34,27 @@ void setup() {
   connectToWifi();
   initWebServer();
   bot.init();
+  botTicker.attach_ms( time_interval, botloop );
 }
 
 void loop() {
   
-  lecturasOPT();
-//  leerBT();
-//  xyAdiferencial();
-//  salidaMotores ();
- esquivaObstaculos ();
-//  paroMotores ();
+  //  lecturasOPT();
+  //  leerBT();
+  //  xyAdiferencial();
+  //  salidaMotores ();
+  //  esquivaObstaculos ();
+  //  paroMotores ();
 
 
-  if (counter_L != ISRCounter_L || counter_R != ISRCounter_R)
+  /*if (counter_L != ISRCounter_L || counter_R != ISRCounter_R)
   {
     counter_L = ISRCounter_L;
     counter_R = ISRCounter_R;
-//    SerialBT.print(counter_L);
-//    SerialBT.print (" : ");
-//    SerialBT.println(counter_R);
+    */
+    //    SerialBT.print(counter_L);
+    //    SerialBT.print (" : ");
+    //    SerialBT.println(counter_R);
     // SerialBT.print (" // ");
-  }
+  //}
 }

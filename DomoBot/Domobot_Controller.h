@@ -1,13 +1,30 @@
-class DomoBot{
+#include "Domo_Controller.h"
+Ticker botTicker;
+
+#ifdef OPTO
+  #include "OPT_Controller.h" 
+#endif
+
+class DomoBot : public Domo {
   public:
 
     typedef void ( DomoBot::*_f_bot )();
+    _f_bot controller = &DomoBot::idle; //Loop Controller Function
+
+    #ifdef IMU_ENABLE 
+      IMU mpu;
+    #endif
     
-    DomoBot( uint16_t motor_config ){
+    #ifdef OPTO
+      OPT3101 OPT;
+    #endif
+
+    DomoBot( uint16_t motor_config ): Domo(){
     
     }
 
     void init(){
+      
       pinMode(IntPin_A, INPUT_PULLUP);
       pinMode(IntPin_B, INPUT_PULLUP);
       pinMode(IntPin_C, INPUT_PULLUP);
@@ -16,6 +33,7 @@ class DomoBot{
       attachInterrupt(IntPin_A, doEncodeB, CHANGE);
       attachInterrupt(IntPin_C, doEncodeC, CHANGE);
       attachInterrupt(IntPin_D, doEncodeD, CHANGE);
+
       pinMode (IZQ_PWM, OUTPUT);
       pinMode (IZQ_AVZ, OUTPUT);
       pinMode (IZQ_RET, OUTPUT);
@@ -36,7 +54,11 @@ class DomoBot{
       digitalWrite(DER_RET, LOW);
       ledcWrite (DER_PWM_Ch, 0);
       ledcWrite (IZQ_PWM_Ch, 0);
-    
+      
+      #ifdef IMU_ENABLE 
+        mpu.initIMU();
+      #endif
+      
       sensor.init();
       if (sensor.getLastError())
       {
@@ -49,7 +71,33 @@ class DomoBot{
       sensor.setBrightness(OPT3101Brightness::Adaptive);
       sensor.startSample();
     }
+
+    void loop(){
+      (this->*controller)();
+      
+      #ifdef IMU_ENABLE 
+        mpu.updateIMU();
+      #endif
+    }
+
+    void idle(){
+      if( millis() - run_millis >= this->currentStatus.latency ){
+        run_millis = millis();
+      }
+    };
+
+    void setDomo(){
+      switch (this->currentStatus.effect) {
+        case OFF:
+
+        break;
+        default:
+        
+        break;
+      }
+    };
 };
+
 
 
 void esquivaObstaculos ()

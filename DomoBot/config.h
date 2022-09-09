@@ -8,8 +8,14 @@ char DOMOLAMP_ID  [BOT_ID_LEN]   = "D0M0B0T";
 #define IntPin_C     35
 #define IntPin_D     34
 
-// Pinout MPU CONFIG
+// Pinout IMU MPU CONFIG
+#define IMU_ENABLE false
+#define IMU_INTERRUPT_MODE false
 #define MPU_INTERRUPT_PIN   19
+long IMU_time_interval = 20;
+
+// Pinout OPT
+#define OPTO true
 
 // Pinout MOTOR CONFIG
 #define IZQ_PWM      27
@@ -73,6 +79,9 @@ bool IsCW_R = true;
 // SERVER CONFIG
 #define SERVER_EVENTS_ENDPOINT "/bot_events"
 #define DATA_REQUEST_INPUT "botData"
+
+// STREAM CONFIG
+#define STREAM_CHARLENGTH 4
 
 // SLEEP CONFIG
 #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */

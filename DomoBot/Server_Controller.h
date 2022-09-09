@@ -21,6 +21,7 @@ void initWebServer() {
       String jsonData = request->getParam(DATA_REQUEST_INPUT)->value();
       Serial.print(" JSON Data ");
       Serial.println( jsonData );
+      bot.setStatus(jsonData);
       request->send(200, "text/plain", "OK");
     }
   });
