@@ -1,13 +1,9 @@
-#ifdef IMU_ENABLE
+#if IMU_ENABLE
 
   #include "I2Cdev.h"
   #include "MPU6050_6Axis_MotionApps20.h"
-  
-  #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
-      #include "Wire.h"
-  #endif
 
-  #ifdef IMU_INTERRUPT_MODE
+  #if IMU_INTERRUPT_MODE
     volatile bool mpuInterrupt = false;     // indicates whether MPU interrupt pin has gone high
   #endif
   
@@ -40,7 +36,7 @@
       // ===               INTERRUPT DETECTION ROUTINE                ===
       // ================================================================
       
-      #ifdef IMU_INTERRUPT_MODE
+      #if IMU_INTERRUPT_MODE
         static void dmpDataReady() {
             mpuInterrupt = true;
         }
@@ -48,9 +44,18 @@
       
        void initIMU(){
         // Initialize device
+          // join I2C bus (I2Cdev library doesn't do this automatically)
+          #if IMU_ENABLE && I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
+              Wire.begin();
+              Wire.setClock(400000); // 400kHz I2C clock. Comment this line if having compilation difficulties
+          #elif IMU_ENABLE && I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
+              Fastwire::setup(400, true);
+          #endif
+          
           Serial.println(F("Initializing I2C devices..."));
           this->initialize();
-          #ifdef IMU_INTERRUPT_MODE
+          
+          #if IMU_INTERRUPT_MODE
             pinMode(MPU_INTERRUPT_PIN, INPUT);
           #endif
           
@@ -84,7 +89,7 @@
               Serial.println(F("Enabling DMP..."));
               this->setDMPEnabled(true);
 
-              #ifdef IMU_INTERRUPT_MODE
+              #if IMU_INTERRUPT_MODE
                 // enable Arduino interrupt detection
                 Serial.print(F("Enabling interrupt detection (Arduino external interrupt "));
                 Serial.print(digitalPinToInterrupt(MPU_INTERRUPT_PIN));

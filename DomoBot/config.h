@@ -1,21 +1,24 @@
 #define BOT_ID_LEN         16
 char DOMOLAMP_ID  [BOT_ID_LEN]   = "D0M0B0T";
 
-// Pinout CONFIG
-
-#define IntPin_A     36
-#define IntPin_B     39
-#define IntPin_C     35
-#define IntPin_D     34
+// Pinout Encoder CONFIG
+// Encoder 1000 steps = 180mm
+#define EncoderPin_A     36  
+#define EncoderPin_B     39
+#define EncoderPin_C     35
+#define EncoderPin_D     34
+#define ENCODER_DEBUG false
 
 // Pinout IMU MPU CONFIG
 #define IMU_ENABLE false
 #define IMU_INTERRUPT_MODE false
 #define MPU_INTERRUPT_PIN   19
 long IMU_time_interval = 20;
+#define IMU_DEBUG false
 
 // Pinout OPT
-#define OPTO true
+#define OPTO false
+#define OPTO_DEBUG false
 
 // Pinout MOTOR CONFIG
 #define IZQ_PWM      27
@@ -24,6 +27,7 @@ long IMU_time_interval = 20;
 #define DER_PWM      13
 #define DER_AVZ      12
 #define DER_RET      14
+#define DOMOBOT_DEBUG true
 
 // Setup PWM ESP32
 const int DER_PWM_Ch = 0;

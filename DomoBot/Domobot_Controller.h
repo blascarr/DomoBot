@@ -1,9 +1,23 @@
 #include "Domo_Controller.h"
 Ticker botTicker;
 
-#ifdef OPTO
-  #include "OPT_Controller.h" 
-#endif
+#include "EncoderStepCounter.h"
+
+EncoderStepCounter Right_Encoder(  EncoderPin_B , EncoderPin_A );
+EncoderStepCounter Left_Encoder( EncoderPin_D, EncoderPin_C );
+
+#include "OPT_Controller.h" 
+#include "IMU_Controller.h"
+
+#include "Motor_Controller.h" 
+#include "PID_Controller.h"
+void RightInterrupt() {
+  Right_Encoder.tick();
+}
+
+void LeftInterrupt() {
+  Left_Encoder.tick();
+}
 
 class DomoBot : public Domo {
   public:
@@ -11,11 +25,16 @@ class DomoBot : public Domo {
     typedef void ( DomoBot::*_f_bot )();
     _f_bot controller = &DomoBot::idle; //Loop Controller Function
 
-    #ifdef IMU_ENABLE 
+    MotorController motors;
+    int last_rightPos, last_leftPos;
+    long wheelR_position, wheelL_position;
+    long bot_position;
+    
+    #if IMU_ENABLE 
       IMU mpu;
     #endif
     
-    #ifdef OPTO
+    #if OPTO
       OPT3101 OPT;
     #endif
 
@@ -24,15 +43,16 @@ class DomoBot : public Domo {
     }
 
     void init(){
-      
-      pinMode(IntPin_A, INPUT_PULLUP);
-      pinMode(IntPin_B, INPUT_PULLUP);
-      pinMode(IntPin_C, INPUT_PULLUP);
-      pinMode(IntPin_D, INPUT_PULLUP);
-      attachInterrupt(IntPin_A, doEncodeA, CHANGE);
-      attachInterrupt(IntPin_A, doEncodeB, CHANGE);
-      attachInterrupt(IntPin_C, doEncodeC, CHANGE);
-      attachInterrupt(IntPin_D, doEncodeD, CHANGE);
+      #if OPTO || IMU_ENABLE
+        Wire.begin();
+      #endif
+      motors.setRightEncoder( Right_Encoder );
+      motors.setLeftEncoder( Left_Encoder );
+      motors.init();
+      attachInterrupt(EncoderPin_A, RightInterrupt , CHANGE);
+      attachInterrupt(EncoderPin_B, RightInterrupt , CHANGE);
+      attachInterrupt(EncoderPin_C, LeftInterrupt , CHANGE);
+      attachInterrupt(EncoderPin_D, LeftInterrupt , CHANGE);
 
       pinMode (IZQ_PWM, OUTPUT);
       pinMode (IZQ_AVZ, OUTPUT);
@@ -55,34 +75,42 @@ class DomoBot : public Domo {
       ledcWrite (DER_PWM_Ch, 0);
       ledcWrite (IZQ_PWM_Ch, 0);
       
-      #ifdef IMU_ENABLE 
+      #if IMU_ENABLE 
         mpu.initIMU();
       #endif
-      
-      sensor.init();
-      if (sensor.getLastError())
-      {
-        Serial.print(F("Failed to initialize OPT3101: error "));
-        Serial.println(sensor.getLastError());
-        while (1) {}
-      }
-      sensor.setFrameTiming(256);
-      sensor.setChannel(0);
-      sensor.setBrightness(OPT3101Brightness::Adaptive);
-      sensor.startSample();
+
+      #if OPTO
+        sensor.init();
+        if (sensor.getLastError())
+        {
+          Serial.print(F("Failed to initialize OPT3101: error "));
+          Serial.println(sensor.getLastError());
+          while (1) {}
+        }
+        sensor.setFrameTiming(256);
+        sensor.setChannel(0);
+        sensor.setBrightness(OPT3101Brightness::Adaptive);
+        sensor.startSample();
+      #endif
     }
 
     void loop(){
       (this->*controller)();
       
-      #ifdef IMU_ENABLE 
+      #if IMU_ENABLE 
         mpu.updateIMU();
+      #endif
+
+      #if OPTO
+        lecturasOPT();
       #endif
     }
 
     void idle(){
       if( millis() - run_millis >= this->currentStatus.latency ){
         run_millis = millis();
+        //encoder_update();
+        calculate_position();
       }
     };
 
@@ -96,9 +124,42 @@ class DomoBot : public Domo {
         break;
       }
     };
+
+    void calculate_position(){
+      encoder_update();
+      if( last_rightPos != 0 || last_leftPos != 0 ){
+        wheelR_position += last_rightPos;
+        wheelL_position += last_leftPos;
+        Left_Encoder.reset();
+        Right_Encoder.reset();
+        
+        #if DOMOBOT_DEBUG
+          Serial.print("Right Wheel: ");
+          Serial.print( wheelR_position);
+          Serial.print(" - Left Wheel: ");
+          Serial.print(wheelL_position);
+          Serial.print(" -> Current Position: ");
+          Serial.println( bot_position );
+        #endif
+      }
+    }
+    
+    void encoder_update(){
+        signed char rightPos = Right_Encoder.getPosition();
+        signed char leftPos = Left_Encoder.getPosition();
+        if( rightPos != last_rightPos || leftPos != last_leftPos ){
+          last_rightPos = rightPos;
+          last_leftPos = leftPos;
+          
+          #if ENCODER_DEBUG
+            Serial.print("Right Encoder: ");
+            Serial.print(rightPos);
+            Serial.print(" - Left Encoder: ");
+            Serial.println(leftPos);
+          #endif
+        }
+    }
 };
-
-
 
 void esquivaObstaculos ()
 {

@@ -1,5 +1,39 @@
+//#include "MotorEncoder_Controller.h"
+#include "EncoderStepCounter.h"
+
 class MotorController{
-  
+  public:
+      EncoderStepCounter *Right_Encoder;
+      EncoderStepCounter *Left_Encoder;
+      //EncoderStepCounter Right_Encoder( 36 , 39 );
+      //EncoderStepCounter Left_Encoder( EncoderPin_C, EncoderPin_D );
+    //MotorEncoder Right_Encoder( IntPin_A , IntPin_B );
+    //MotorEncoder Left_Encoder( IntPin_C, IntPin_D );
+      MotorController( ){
+        
+      }
+      
+      MotorController( EncoderStepCounter &Right_Enc , EncoderStepCounter &Left_Enc ){
+        Right_Encoder = &Right_Enc;
+        Left_Encoder = &Left_Enc;
+      }
+
+      void setRightEncoder( EncoderStepCounter &Right_Enc ){
+        Right_Encoder = &Right_Enc;
+        Right_Encoder->begin();
+      }
+
+      void setLeftEncoder( EncoderStepCounter &Right_Enc ){
+        Left_Encoder = &Right_Enc;
+        Left_Encoder->begin();
+      }
+      
+      void init(){
+        
+        //attachInterrupt(EncoderPin_A, Right_Encoder->tick() , CHANGE);
+        //attachInterrupt(EncoderPin_B, Right_Encoder->tick() , CHANGE);
+        //attachInterrupt(IntPin_B, interrupt, CHANGE);
+      }
 };
 
 
