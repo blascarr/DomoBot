@@ -9,11 +9,18 @@ struct statusBot{
 class Domo{
   public:
     statusBot currentStatus;
+    AsyncEventSource *eventSource;
+    
     long run_millis;
     Domo(){
       
     }
     virtual void setDomo(){};
+
+    void setEventSource( AsyncEventSource &source ){
+        eventSource = &source;
+    }
+      
     void setStatus( String payload ){
       Serial.print("Set status from JSON: ");
       Serial.println( payload );

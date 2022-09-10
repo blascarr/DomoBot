@@ -83,6 +83,8 @@ bool IsCW_R = true;
 // SERVER CONFIG
 #define SERVER_EVENTS_ENDPOINT "/bot_events"
 #define DATA_REQUEST_INPUT "botData"
+#define MAP_EVENTS_ENDPOINT "/map_events"
+#define MAP_STREAM "map_data"
 
 // STREAM CONFIG
 #define STREAM_CHARLENGTH 4

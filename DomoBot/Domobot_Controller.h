@@ -132,6 +132,9 @@ class DomoBot : public Domo {
         wheelL_position += last_leftPos;
         Left_Encoder.reset();
         Right_Encoder.reset();
+
+        //Send Position to /map_events endpoint
+        eventSource->send(getReadings().c_str(), MAP_STREAM , millis());
         
         #if DOMOBOT_DEBUG
           Serial.print("Right Wheel: ");
@@ -142,6 +145,13 @@ class DomoBot : public Domo {
           Serial.println( bot_position );
         #endif
       }
+    }
+
+    String getReadings(){
+      JSONVar bot_info;
+      bot_info["wheelR"] = String( wheelR_position );
+      bot_info["wheelL"] = String( wheelL_position );
+      return JSON.stringify( bot_info );
     }
     
     void encoder_update(){
