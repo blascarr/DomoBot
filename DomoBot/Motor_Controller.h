@@ -5,10 +5,7 @@ class MotorController{
   public:
       EncoderStepCounter *Right_Encoder;
       EncoderStepCounter *Left_Encoder;
-      //EncoderStepCounter Right_Encoder( 36 , 39 );
-      //EncoderStepCounter Left_Encoder( EncoderPin_C, EncoderPin_D );
-    //MotorEncoder Right_Encoder( IntPin_A , IntPin_B );
-    //MotorEncoder Left_Encoder( IntPin_C, IntPin_D );
+
       MotorController( ){
         
       }
@@ -17,14 +14,21 @@ class MotorController{
         Right_Encoder = &Right_Enc;
         Left_Encoder = &Left_Enc;
       }
-
+      
+      void setEncoders( EncoderStepCounter &Right_Enc, EncoderStepCounter &Left_Enc ){
+        Right_Encoder = &Right_Enc;
+        Left_Encoder = &Left_Enc;
+        Right_Encoder->begin();
+        Left_Encoder->begin();
+      }
+      
       void setRightEncoder( EncoderStepCounter &Right_Enc ){
         Right_Encoder = &Right_Enc;
         Right_Encoder->begin();
       }
 
-      void setLeftEncoder( EncoderStepCounter &Right_Enc ){
-        Left_Encoder = &Right_Enc;
+      void setLeftEncoder( EncoderStepCounter &Left_Enc ){
+        Left_Encoder = &Left_Enc;
         Left_Encoder->begin();
       }
       
@@ -34,18 +38,38 @@ class MotorController{
         //attachInterrupt(EncoderPin_B, Right_Encoder->tick() , CHANGE);
         //attachInterrupt(IntPin_B, interrupt, CHANGE);
       }
+
+      void move( int power, float theta ){
+        Serial.print("MOVE: ");
+          int analogPower = map ( power, 0, MAX_POWER, 0, 1023 );
+          int analogTheta = map ( theta, 0, 360, 0, 1023 );
+          Lspeed = analogPower + analogTheta;
+          Rspeed = analogPower - analogTheta;
+          //Serial.println( analogPower );
+          
+         #if defined(ESP32)
+            digitalWrite( DER_AVZ, HIGH );
+            digitalWrite( DER_RET, HIGH);
+            ledcWrite (DER_PWM_Ch, Rspeed);
+            ledcWrite (IZQ_PWM_Ch, Lspeed);
+         #endif
+      }
 };
 
 
 void MoverDch (bool DerAvz, bool DerRet, int DSpeed){
   digitalWrite(DER_AVZ, DerAvz);
  digitalWrite(DER_RET, DerRet);
- ledcWrite (DER_PWM_Ch, DSpeed);
+ #if defined(ESP32)
+  ledcWrite (DER_PWM_Ch, DSpeed);
+ #endif
 }
 void MoverIzq(bool IzqAvz, bool IzqRet, int ISpeed){
   digitalWrite(IZQ_AVZ, IzqAvz);
  digitalWrite(IZQ_RET, IzqRet);
- ledcWrite (IZQ_PWM_Ch, ISpeed);
+ #if defined(ESP32)
+  ledcWrite (IZQ_PWM_Ch, ISpeed);
+ #endif
 }
 
 void giraDch () {
@@ -82,8 +106,10 @@ void salidaMotores () {
   Rspeed = abs(Rspeed);  if (Rspeed < 30) Rspeed = 0;
   Lspeed = constrain (Lspeed, 0, 1023);
   Rspeed = constrain (Rspeed, 0, 1023);
-  ledcWrite (IZQ_PWM_Ch, Lspeed);
-  ledcWrite (DER_PWM_Ch, Rspeed);
+  #if defined(ESP32)
+    ledcWrite (IZQ_PWM_Ch, Lspeed);
+    ledcWrite (DER_PWM_Ch, Rspeed);
+  #endif
   // Serial.print ("L  "); Serial.print (Lspeed); Serial.print ("R  "); Serial.println(Rspeed);
 }
 

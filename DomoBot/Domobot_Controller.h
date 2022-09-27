@@ -46,8 +46,7 @@ class DomoBot : public Domo {
       #if OPTO || IMU_ENABLE
         Wire.begin();
       #endif
-      motors.setRightEncoder( Right_Encoder );
-      motors.setLeftEncoder( Left_Encoder );
+      motors.setEncoders( Right_Encoder, Left_Encoder );
       motors.init();
       attachInterrupt(EncoderPin_A, RightInterrupt , CHANGE);
       attachInterrupt(EncoderPin_B, RightInterrupt , CHANGE);
@@ -66,14 +65,14 @@ class DomoBot : public Domo {
         ledcSetup(DER_PWM_Ch, PWM_Freq, PWM_Res);
         ledcAttachPin(IZQ_PWM, IZQ_PWM_Ch);
         ledcAttachPin(DER_PWM, DER_PWM_Ch);
+        ledcWrite (DER_PWM_Ch, 0);
+        ledcWrite (IZQ_PWM_Ch, 0);
       #endif
     
       digitalWrite(IZQ_AVZ, LOW);
       digitalWrite(IZQ_RET, LOW);
       digitalWrite(DER_AVZ, LOW);
       digitalWrite(DER_RET, LOW);
-      ledcWrite (DER_PWM_Ch, 0);
-      ledcWrite (IZQ_PWM_Ch, 0);
       
       #if IMU_ENABLE 
         mpu.initIMU();
@@ -115,7 +114,10 @@ class DomoBot : public Domo {
     };
 
     void setDomo(){
-      switch (this->currentStatus.effect) {
+      switch (this->currentStatus.controller) {
+        case JOYSTICK:
+            controller = &DomoBot::joystickMove;
+            break;
         case OFF:
 
         break;
@@ -125,6 +127,10 @@ class DomoBot : public Domo {
       }
     };
 
+    void joystickMove(){
+      motors.move( this->currentStatus.power, this->currentStatus.theta );
+    }
+    
     void calculate_position(){
       encoder_update();
       if( last_rightPos != 0 || last_leftPos != 0 ){

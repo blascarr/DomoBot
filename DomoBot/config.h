@@ -36,6 +36,8 @@ const int PWM_Res = 10;
 const int PWM_Freq = 20000;
 
 //  Variables modo, velocidad y JOYSTICK
+int MAX_POWER = 50;
+
 int mode;
 int pad_x, pad_y;
 int Lspeed = 0;

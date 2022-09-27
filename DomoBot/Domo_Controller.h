@@ -1,7 +1,10 @@
-enum modes { UNDEF, FORWARD, BACKWARD, LTURN, RTURN, LEFT, RIGHT, STOP, OFF };
+enum modes { UNDEF, JOYSTICK, FORWARD, BACKWARD, LTURN, RTURN, LEFT, RIGHT, STOP, OFF };
+enum moveform { ABSOLUTE, INCREMENTAL, RELATIVE };
+
 struct statusBot{
-  uint8_t speed = 100;
-  modes effect;
+  uint8_t power = 100;
+  float theta = 0;
+  modes controller;
   String mode;
   uint16_t latency;
 };
@@ -32,16 +35,23 @@ class Domo{
       
       Serial.print("JSON.typeof(myObject) = ");
       Serial.println(JSON.typeof(domoJSON)); // prints: object
+      Serial.println();
 
-      if (domoJSON.hasOwnProperty("effect")) {
+      if (domoJSON.hasOwnProperty("power")) {
+        this->currentStatus.power = (int) domoJSON["power"];
+      }
+      if (domoJSON.hasOwnProperty("angle")) {
+        this->currentStatus.theta = (double) domoJSON["angle"]["degree"];
+      }
+         
+      if (domoJSON.hasOwnProperty("mode")) {
+        //Serial.println("BOT MODE: ");
         int len = STREAM_CHARLENGTH;
         char messageArray[len];
-        memcpy ( messageArray, (const char*)domoJSON["effect"], len );
+        memcpy ( messageArray, (const char*)domoJSON["mode"], len );
         String message(messageArray);
-        Serial.println(message);
-        this->currentStatus.mode = message;
-        Serial.println(this->currentStatus.mode);
-        setDomoStatus( this->currentStatus.mode );
+
+        setDomoStatus( message );
       }
 
       setDomo();
@@ -49,41 +59,53 @@ class Domo{
     
     void setDomoStatus( String mode ){
         if( mode.indexOf("FORW") == 0 ){
-           this->currentStatus.effect = FORWARD;
+           setStatusMode( FORWARD );
            Serial.println("FORWARD");
         }
         if( mode.indexOf("BACK") == 0 ){
-           this->currentStatus.effect = BACKWARD;
+           setStatusMode( BACKWARD );
            Serial.println("BACKWARD");
         }
         if( mode.indexOf("LTUR") == 0 ){
-           this->currentStatus.effect = LTURN;
+           setStatusMode( LTURN );
            Serial.println("TURNLEFT");
         }
         if( mode.indexOf("RTUR") == 0 ){
-           this->currentStatus.effect = RTURN;
+           setStatusMode( RTURN );
            Serial.println("TURNRIGHT");
         }
         if( mode.indexOf("LEFT") == 0 ){
-           this->currentStatus.effect = LEFT;
+           setStatusMode( LEFT );
            Serial.println("LEFT");
         }
         if( mode.indexOf("RIGH") == 0 ){
-           this->currentStatus.effect = RIGHT;
+           setStatusMode( RIGHT );
            Serial.println("RIGHT");
         }
         if( mode.indexOf("STOP") == 0 ){
-           this->currentStatus.effect = STOP;
+           setStatusMode( STOP );
            Serial.println("STOP");
         }
         if( mode.indexOf("OFF") == 0 ){
-           this->currentStatus.effect = OFF;
+           setStatusMode( OFF );
            Serial.println("OFF");
         }
+        if( mode.indexOf("joys") == 0 ){
+           setStatusMode( JOYSTICK );
+           Serial.println("JOYSTICK");
+        }
         if( mode.indexOf("UNDE") == 0 ){
-           this->currentStatus.effect = UNDEF;
+           setStatusMode( UNDEF );
            Serial.println("UNDEF");
         }
+    }
+
+    bool setStatusMode( modes status){
+      if( this->currentStatus.controller != status ){
+        this->currentStatus.controller = status;
+        return true;
+      }
+      return false;
     }
     
 };

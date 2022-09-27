@@ -147,18 +147,25 @@ domget = (dom) => {
 }
 
 domoData = ( data ) => {
-
-    let dataJSON = { position: data.position, direction: data.direction, angle: data.angle, pressure: data.pressure };
-
-    HTTPRequest( "domobot", "botData" , JSON.stringify(dataJSON) );
+    const [toggle] = $('#toggle_retain');
+    let controlmode = ""; 
+    if ( toggle.checked ){
+        controlmode = "joystick"
+    }else{
+        controlmode = "move"
+    }
+    let dataJSON = { power: data.distance, angle: data.angle, direction: data.direction, mode: controlmode };
+    HTTPRequest( "domobot", "botData" , dataJSON );
 }
 
 HTTPRequest = ( endpoint, data_endpoint , dataJSON , method = "GET" )=>{
-    const xhr = new XMLHttpRequest();console.log( $('#toggle_retain').checked );
+    const xhr = new XMLHttpRequest();
+    
     xhr.onload = () => {
 
         if (xhr.status == 200) {
             try{ 
+
                 console.log(JSON.parse(xhr.response));
             }catch(e) { 
                 // Get OK response which is not parseable
