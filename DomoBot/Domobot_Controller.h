@@ -2,9 +2,13 @@
 Ticker botTicker;
 
 #include "EncoderStepCounter.h"
+#include "Wheel_Controller.h"
 
 EncoderStepCounter Right_Encoder(  EncoderPin_B , EncoderPin_A );
 EncoderStepCounter Left_Encoder( EncoderPin_D, EncoderPin_C );
+
+WheelController Left_Wheel( LEFT_WHEEL_PWM , LEFT_WHEEL_IN1 , LEFT_WHEEL_IN2 );
+WheelController Right_Wheel( RIGHT_WHEEL_PWM , RIGHT_WHEEL_IN1 , RIGHT_WHEEL_IN2 );
 
 #include "OPT_Controller.h" 
 #include "IMU_Controller.h"
@@ -47,32 +51,13 @@ class DomoBot : public Domo {
         Wire.begin();
       #endif
       motors.setEncoders( Right_Encoder, Left_Encoder );
+      motors.setWheels( Right_Wheel, Left_Wheel );
       motors.init();
+      
       attachInterrupt(EncoderPin_A, RightInterrupt , CHANGE);
       attachInterrupt(EncoderPin_B, RightInterrupt , CHANGE);
       attachInterrupt(EncoderPin_C, LeftInterrupt , CHANGE);
       attachInterrupt(EncoderPin_D, LeftInterrupt , CHANGE);
-
-      pinMode (IZQ_PWM, OUTPUT);
-      pinMode (IZQ_AVZ, OUTPUT);
-      pinMode (IZQ_RET, OUTPUT);
-      pinMode (DER_PWM, OUTPUT);
-      pinMode (DER_AVZ, OUTPUT);
-      pinMode (DER_RET, OUTPUT);
-    
-      #if defined(ESP32)
-        ledcSetup(IZQ_PWM_Ch, PWM_Freq, PWM_Res);
-        ledcSetup(DER_PWM_Ch, PWM_Freq, PWM_Res);
-        ledcAttachPin(IZQ_PWM, IZQ_PWM_Ch);
-        ledcAttachPin(DER_PWM, DER_PWM_Ch);
-        ledcWrite (DER_PWM_Ch, 0);
-        ledcWrite (IZQ_PWM_Ch, 0);
-      #endif
-    
-      digitalWrite(IZQ_AVZ, LOW);
-      digitalWrite(IZQ_RET, LOW);
-      digitalWrite(DER_AVZ, LOW);
-      digitalWrite(DER_RET, LOW);
       
       #if IMU_ENABLE 
         mpu.initIMU();

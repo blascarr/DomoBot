@@ -1,11 +1,18 @@
-//#include "MotorEncoder_Controller.h"
-#include "EncoderStepCounter.h"
+
+
+enum wheelStatus { FWD, BCK, TURNLEFT, TURNRIGHT, TURNL, TURNR, POWEROFF };
 
 class MotorController{
   public:
       EncoderStepCounter *Right_Encoder;
       EncoderStepCounter *Left_Encoder;
-
+      WheelController *left_wheel;
+      WheelController *right_wheel;
+      
+      wheelStatus currentStatus = POWEROFF;
+      
+      //_f_motor controller = &MotorController::wheels; //Loop Controller Function
+      
       MotorController( ){
         
       }
@@ -21,6 +28,23 @@ class MotorController{
         Right_Encoder->begin();
         Left_Encoder->begin();
       }
+
+      void setWheels( WheelController &Right_Wheel, WheelController &Left_Wheel ){
+        right_wheel = &Right_Wheel;
+        left_wheel= &Left_Wheel;
+        right_wheel->begin();
+        left_wheel->begin();
+      }
+
+      void setRightWheel( WheelController &Right_Wheel ){
+        right_wheel = &Right_Wheel;
+        right_wheel->begin();
+      }
+
+      void setLeftWheel( WheelController &Left_Wheel ){
+        left_wheel = &Left_Wheel;
+        left_wheel->begin();
+      }
       
       void setRightEncoder( EncoderStepCounter &Right_Enc ){
         Right_Encoder = &Right_Enc;
@@ -33,43 +57,75 @@ class MotorController{
       }
       
       void init(){
-        
+        #if defined(ESP32)
+          ledcSetup(LEFT_WHEEL_PWM_Ch, PWM_Freq, PWM_Res);
+          ledcSetup(RIGHT_WHEEL_PWM_Ch, PWM_Freq, PWM_Res);
+          ledcAttachPin(LEFT_WHEEL_PWM, LEFT_WHEEL_PWM_Ch);
+          ledcAttachPin(RIGHT_WHEEL_PWM, RIGHT_WHEEL_PWM_Ch);
+          ledcWrite (RIGHT_WHEEL_PWM_Ch, 0);
+          ledcWrite (LEFT_WHEEL_PWM_Ch, 0);
+        #endif
         //attachInterrupt(EncoderPin_A, Right_Encoder->tick() , CHANGE);
         //attachInterrupt(EncoderPin_B, Right_Encoder->tick() , CHANGE);
         //attachInterrupt(IntPin_B, interrupt, CHANGE);
       }
-
+      
       void move( int power, float theta ){
         Serial.print("MOVE: ");
           int analogPower = map ( power, 0, MAX_POWER, 0, 1023 );
           int analogTheta = map ( theta, 0, 360, 0, 1023 );
-          Lspeed = analogPower + analogTheta;
-          Rspeed = analogPower - analogTheta;
+          Lspeed = analogPower;
+          Rspeed = analogPower;
           //Serial.println( analogPower );
-          
+          wheels( FWD );
+      
          #if defined(ESP32)
-            digitalWrite( DER_AVZ, HIGH );
-            digitalWrite( DER_RET, HIGH);
-            ledcWrite (DER_PWM_Ch, Rspeed);
-            ledcWrite (IZQ_PWM_Ch, Lspeed);
+            ledcWrite (RIGHT_WHEEL_PWM_Ch, Rspeed);
+            ledcWrite (LEFT_WHEEL_PWM_Ch, Lspeed);
          #endif
+      }
+
+      void wheels( wheelStatus status ){
+        if( status != currentStatus){
+          currentStatus = status;
+          switch (currentStatus){
+            case POWEROFF:
+              setWheelsDir( 0, 0 );
+            break;
+            case FWD:
+              setWheelsDir( 1, 1 );
+            break;
+            case BCK:
+              setWheelsDir( -1, -1 );
+            break;
+            case TURNLEFT:
+              setWheelsDir( -1, 1 );
+            break;
+            case TURNRIGHT:
+              setWheelsDir( 1, -1 );
+            break;
+            case TURNL:
+              setWheelsDir( 0, 1 );
+            break;
+            case TURNR:
+              setWheelsDir( 1, 0 );
+            break;
+          }
+        }
+      }
+
+      void setWheelsDir ( int _left_dir , int _right_dir ){
+        left_wheel->wheel( _left_dir );
+        right_wheel->wheel( _right_dir );
       }
 };
 
 
 void MoverDch (bool DerAvz, bool DerRet, int DSpeed){
-  digitalWrite(DER_AVZ, DerAvz);
- digitalWrite(DER_RET, DerRet);
- #if defined(ESP32)
-  ledcWrite (DER_PWM_Ch, DSpeed);
- #endif
+
 }
 void MoverIzq(bool IzqAvz, bool IzqRet, int ISpeed){
-  digitalWrite(IZQ_AVZ, IzqAvz);
- digitalWrite(IZQ_RET, IzqRet);
- #if defined(ESP32)
-  ledcWrite (IZQ_PWM_Ch, ISpeed);
- #endif
+
 }
 
 void giraDch () {
@@ -89,27 +145,20 @@ void paroMotores () {
 
 void salidaMotores () {
     if (Lspeed < 0) {
-    digitalWrite(IZQ_AVZ, LOW);
-    digitalWrite(IZQ_RET, HIGH);
+
   } else {
-    digitalWrite(IZQ_AVZ, HIGH);
-    digitalWrite(IZQ_RET, LOW);
+
   }
   if (Rspeed < 0) {
-    digitalWrite(DER_AVZ, LOW);
-    digitalWrite(DER_RET, HIGH);
+
   } else {
-    digitalWrite(DER_AVZ, HIGH);
-    digitalWrite(DER_RET, LOW);
+
   }
   Lspeed = abs(Lspeed);  if (Lspeed < 30) Lspeed = 0;
   Rspeed = abs(Rspeed);  if (Rspeed < 30) Rspeed = 0;
   Lspeed = constrain (Lspeed, 0, 1023);
   Rspeed = constrain (Rspeed, 0, 1023);
-  #if defined(ESP32)
-    ledcWrite (IZQ_PWM_Ch, Lspeed);
-    ledcWrite (DER_PWM_Ch, Rspeed);
-  #endif
+
   // Serial.print ("L  "); Serial.print (Lspeed); Serial.print ("R  "); Serial.println(Rspeed);
 }
 

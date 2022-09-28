@@ -21,18 +21,19 @@ long IMU_time_interval = 20;
 #define OPTO_DEBUG false
 
 // Pinout MOTOR CONFIG
-#define IZQ_PWM      5
-#define IZQ_AVZ      17
-#define IZQ_RET      16
 
-#define DER_PWM      23
-#define DER_AVZ      19
-#define DER_RET      18
+#define RIGHT_WHEEL_PWM      5
+#define RIGHT_WHEEL_IN1      18
+#define RIGHT_WHEEL_IN2      19
+#define LEFT_WHEEL_PWM      23
+#define LEFT_WHEEL_IN1      17
+#define LEFT_WHEEL_IN2      16
+
 #define DOMOBOT_DEBUG true
 
 // Setup PWM ESP32
-const int DER_PWM_Ch = 0;
-const int IZQ_PWM_Ch = 2;
+const int LEFT_WHEEL_PWM_Ch = 0;
+const int RIGHT_WHEEL_PWM_Ch = 2;
 const int PWM_Res = 10;
 const int PWM_Freq = 20000;
 
