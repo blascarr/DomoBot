@@ -124,7 +124,16 @@ class DomoBot : public Domo {
             }
             
             if( this->currentStatus.movemode == CONTINUOUS ){
-              controller = &DomoBot::manualMovement;
+              float offset = -45;
+              float theta_offset = this->currentStatus.theta + offset;
+              float power_left = this->currentStatus.power*sin( theta_offset*PI/180 );
+              float power_right = this->currentStatus.power*cos( theta_offset*PI/180 );
+              Serial.print("L : ");
+              Serial.print( power_left );
+              Serial.print(" R : ");
+              Serial.println( power_right );
+              motors.setWheelsPower( power_left , power_right , true );
+              controller = &DomoBot::continuousMovement;
             }
             if( this->currentStatus.movemode == INCREMENTAL ){
               controller = &DomoBot::incrementalMovement;
@@ -153,7 +162,7 @@ class DomoBot : public Domo {
     }
 
     void continuousMovement(){
-      motors.move( this->currentStatus.power, this->currentStatus.theta );
+      motors.run();
       calculate_position();
     }
 

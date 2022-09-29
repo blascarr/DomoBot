@@ -11,7 +11,7 @@ struct statusBot{
   
   modes controller = OFF;
   autonomy autobot = MANUAL;
-  movement movemode = DISCRETE;
+  movement movemode = CONTINUOUS;
   
   String mode;
   uint16_t latency;

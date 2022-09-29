@@ -88,10 +88,6 @@ class MotorController{
          #endif
       }
 
-      void moveclock( uint8_t dir ){
-        
-      }
-
       void idle( ){
         
       }
@@ -128,6 +124,22 @@ class MotorController{
       void setWheelsDir ( int _left_dir , int _right_dir ){
         left_wheel->wheel( _left_dir );
         right_wheel->wheel( _right_dir );
+      }
+
+      void setWheelsPower ( int _left_power , int _right_power, bool invert = false ){
+        if ( invert ){
+          if( (_left_power < 0 && _right_power > 0) or ( _left_power > 0 && _right_power < 0 ) ){
+            left_wheel->wheel( - _left_power );
+            right_wheel->wheel( - _right_power );
+          }else{
+            left_wheel->wheel( _left_power );
+            right_wheel->wheel( _right_power );
+          }
+        }else{
+          left_wheel->wheel( _left_power );
+          right_wheel->wheel( _right_power );
+        }
+        powerWheels( abs(_left_power), abs(_right_power) );
       }
 
       void run(){
