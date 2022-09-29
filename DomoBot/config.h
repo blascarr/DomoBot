@@ -1,5 +1,23 @@
+// DOMOBOT SETUP
+
 #define BOT_ID_LEN         16
 char DOMOLAMP_ID  [BOT_ID_LEN]   = "D0M0B0T";
+
+// Pinout MOTOR CONFIG
+#define RIGHT_WHEEL_PWM      5
+#define RIGHT_WHEEL_IN1      18
+#define RIGHT_WHEEL_IN2      19
+#define LEFT_WHEEL_PWM      23
+#define LEFT_WHEEL_IN1      17
+#define LEFT_WHEEL_IN2      16
+
+#define DOMOBOT_DEBUG false
+
+// Setup PWM ESP32
+const int LEFT_WHEEL_PWM_Ch = 0;
+const int RIGHT_WHEEL_PWM_Ch = 2;
+const int PWM_Res = 10;
+const int PWM_Freq = 20000;
 
 // Pinout Encoder CONFIG
 // Encoder 1000 steps = 180mm
@@ -20,30 +38,11 @@ long IMU_time_interval = 20;
 #define OPTO false
 #define OPTO_DEBUG false
 
-// Pinout MOTOR CONFIG
-
-#define RIGHT_WHEEL_PWM      5
-#define RIGHT_WHEEL_IN1      18
-#define RIGHT_WHEEL_IN2      19
-#define LEFT_WHEEL_PWM      23
-#define LEFT_WHEEL_IN1      17
-#define LEFT_WHEEL_IN2      16
-
-#define DOMOBOT_DEBUG true
-
-// Setup PWM ESP32
-const int LEFT_WHEEL_PWM_Ch = 0;
-const int RIGHT_WHEEL_PWM_Ch = 2;
-const int PWM_Res = 10;
-const int PWM_Freq = 20000;
-
 //  Variables modo, velocidad y JOYSTICK
 int MAX_POWER = 50;
 
 int mode;
 int pad_x, pad_y;
-int Lspeed = 0;
-int Rspeed = 0;
 
 //Arrays amplitud y distancia OPT3101
 uint16_t amplitudes[3];
@@ -70,7 +69,6 @@ volatile long ISRCounter_R = 0;
 long counter_R = 0;
 bool IsCW_R = true;
 
-
 // WIFI CONFIG
 #define WIFIMANAGER   false
 
@@ -86,6 +84,7 @@ bool IsCW_R = true;
 
 // SERVER CONFIG
 #define SERVER_EVENTS_ENDPOINT "/bot_events"
+#define DOMOBOT_ENDPOINT "/domobot"
 #define DATA_REQUEST_INPUT "botData"
 #define MAP_EVENTS_ENDPOINT "/map_events"
 #define MAP_STREAM "map_data"

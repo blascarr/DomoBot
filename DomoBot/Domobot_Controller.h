@@ -93,7 +93,6 @@ class DomoBot : public Domo {
     void idle(){
       if( millis() - run_millis >= this->currentStatus.latency ){
         run_millis = millis();
-        //encoder_update();
         calculate_position();
       }
     };
@@ -101,10 +100,41 @@ class DomoBot : public Domo {
     void setDomo(){
       switch (this->currentStatus.controller) {
         case JOYSTICK:
-            controller = &DomoBot::joystickMove;
+            if( this->currentStatus.movemode == DISCRETE ){
+              if( this->currentStatus.wheels != motors.currentStatus ){
+                motors.powerWheels( this->currentStatus.power , this->currentStatus.power );
+                
+                switch ( this->currentStatus.dir  ){
+                  case 0 :
+                    motors.wheels( FORWARD );
+                  break;
+                  case 2 :
+                    motors.wheels( RIGHT );
+                  break;
+                  case 4 :
+                    motors.wheels( BACKWARD );
+                  break;
+                  case 6 :
+                    motors.wheels( LEFT );
+                  break;
+                }
+                
+                controller = &DomoBot::discreteMovement;
+              }
+            }
+            
+            if( this->currentStatus.movemode == CONTINUOUS ){
+              controller = &DomoBot::manualMovement;
+            }
+            if( this->currentStatus.movemode == INCREMENTAL ){
+              controller = &DomoBot::incrementalMovement;
+            }
+            break;
+        case STOP:
+            controller = &DomoBot::stop;
             break;
         case OFF:
-
+            controller = &DomoBot::stop;
         break;
         default:
         
@@ -112,8 +142,30 @@ class DomoBot : public Domo {
       }
     };
 
-    void joystickMove(){
+    void manualMovement(){
       motors.move( this->currentStatus.power, this->currentStatus.theta );
+      calculate_position();
+    }
+
+    void discreteMovement(){
+      motors.run();
+      calculate_position();
+    }
+
+    void continuousMovement(){
+      motors.move( this->currentStatus.power, this->currentStatus.theta );
+      calculate_position();
+    }
+
+    void incrementalMovement(){
+      motors.move( this->currentStatus.power, this->currentStatus.theta );
+      calculate_position();
+    }
+    
+    void stop(){
+      motors.move( 0, 0 );
+      calculate_position();
+      controller = &DomoBot::idle;
     }
     
     void calculate_position(){
@@ -166,30 +218,30 @@ void esquivaObstaculos ()
 {
   if (distances[0] && distances[1] && distances[2] > 300)
   {
-    MoverDch ( 1, 0, 1000);
-    MoverIzq ( 1, 0, 1000);
+    //MoverDch ( 1, 0, 1000);
+    //MoverIzq ( 1, 0, 1000);
   }
   if (distances[0] && distances[1] && distances[2] < 300)
   {
-    MoverDch ( 1, 0, 800);
-    MoverIzq ( 1, 0, 800);
+   // MoverDch ( 1, 0, 800);
+    //MoverIzq ( 1, 0, 800);
   }
   if (distances[0] && distances[1] && distances[2] < 200)
   {
-    MoverDch ( 1, 0, 600);
-    MoverIzq ( 1, 0, 600);
+    //MoverDch ( 1, 0, 600);
+    //MoverIzq ( 1, 0, 600);
   }
   if (distances[1] < 120  )
   {
-    if (distances [0] <= distances [2]) giraDch ();
-    else giraIzq ();
+    //if (distances [0] <= distances [2]) giraDch ();
+    //else giraIzq ();
   }
   if (distances[0] < 110 )
   {
-    MoverIzq ( 1, 0, 600);
+    //MoverIzq ( 1, 0, 600);
   }
   if ( distances[2] < 110 )
   {
-    MoverDch ( 1, 0, 600);
+    //MoverDch ( 1, 0, 600);
   }
 }

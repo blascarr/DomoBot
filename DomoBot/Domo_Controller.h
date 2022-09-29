@@ -1,10 +1,18 @@
-enum modes { UNDEF, JOYSTICK, FORWARD, BACKWARD, LTURN, RTURN, LEFT, RIGHT, STOP, OFF };
-enum moveform { ABSOLUTE, INCREMENTAL, RELATIVE };
+enum modes { UNDEF, JOYSTICK, STOP, OFF };
+enum movement { DISCRETE, CONTINUOUS, INCREMENTAL, RELATIVE, ABSOLUTE };
+enum autonomy { MANUAL, AUTOMATIC };
+enum wheelStatus { FORWARD, BACKWARD, LTURN, RTURN, LEFT, RIGHT, POWEROFF };
 
 struct statusBot{
   uint8_t power = 100;
   float theta = 0;
-  modes controller;
+  uint8_t dir = 0;
+  wheelStatus wheels = POWEROFF;
+  
+  modes controller = OFF;
+  autonomy autobot = MANUAL;
+  movement movemode = DISCRETE;
+  
   String mode;
   uint16_t latency;
 };
@@ -44,8 +52,40 @@ class Domo{
         this->currentStatus.theta = (double) domoJSON["angle"]["degree"];
       }
          
+      if (domoJSON.hasOwnProperty("event")) {
+        int len = STREAM_CHARLENGTH;
+        char messageArray[len];
+        memcpy ( messageArray, (const char*)domoJSON["event"], len );
+        String message(messageArray);
+        
+        setDomoStatus( message );
+      }
+
+      if (domoJSON.hasOwnProperty("direction")) {
+        int len = 2;
+        char messageArray[len];
+        memcpy ( messageArray, (const char*)domoJSON["direction"]["angle"], len );
+        String message(messageArray);
+
+        if( message.indexOf("up") == 0 ){
+            this->currentStatus.dir = 0;
+            this->currentStatus.wheels = FORWARD;
+        }
+        if( message.indexOf("do") == 0 ){
+            this->currentStatus.dir = 4;
+            this->currentStatus.wheels = BACKWARD;
+        }
+        if( message.indexOf("le") == 0 ){
+            this->currentStatus.dir = 6;
+            this->currentStatus.wheels = LEFT;
+        }
+        if( message.indexOf("ri") == 0 ){
+            this->currentStatus.dir = 2;
+            this->currentStatus.wheels = RIGHT;
+        }
+      }
+
       if (domoJSON.hasOwnProperty("mode")) {
-        //Serial.println("BOT MODE: ");
         int len = STREAM_CHARLENGTH;
         char messageArray[len];
         memcpy ( messageArray, (const char*)domoJSON["mode"], len );
@@ -58,29 +98,8 @@ class Domo{
     }
     
     void setDomoStatus( String mode ){
-        if( mode.indexOf("FORW") == 0 ){
-           setStatusMode( FORWARD );
-           Serial.println("FORWARD");
-        }
-        if( mode.indexOf("BACK") == 0 ){
-           setStatusMode( BACKWARD );
-           Serial.println("BACKWARD");
-        }
-        if( mode.indexOf("LTUR") == 0 ){
-           setStatusMode( LTURN );
-           Serial.println("TURNLEFT");
-        }
-        if( mode.indexOf("RTUR") == 0 ){
-           setStatusMode( RTURN );
-           Serial.println("TURNRIGHT");
-        }
-        if( mode.indexOf("LEFT") == 0 ){
-           setStatusMode( LEFT );
-           Serial.println("LEFT");
-        }
-        if( mode.indexOf("RIGH") == 0 ){
-           setStatusMode( RIGHT );
-           Serial.println("RIGHT");
+        if( mode.indexOf("joys") == 0 ){
+           setStatusMode( JOYSTICK );
         }
         if( mode.indexOf("STOP") == 0 ){
            setStatusMode( STOP );
@@ -89,10 +108,6 @@ class Domo{
         if( mode.indexOf("OFF") == 0 ){
            setStatusMode( OFF );
            Serial.println("OFF");
-        }
-        if( mode.indexOf("joys") == 0 ){
-           setStatusMode( JOYSTICK );
-           Serial.println("JOYSTICK");
         }
         if( mode.indexOf("UNDE") == 0 ){
            setStatusMode( UNDEF );

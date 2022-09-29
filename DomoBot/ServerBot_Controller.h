@@ -5,7 +5,7 @@ void initWebServer() {
     request->send_P(200, "text/html", domobot_html);
   });
 
-   server.on("/domobot", HTTP_GET, [] (AsyncWebServerRequest *request) {  
+   server.on( DOMOBOT_ENDPOINT, HTTP_GET, [] (AsyncWebServerRequest *request) {  
     if (request->hasParam( DATA_REQUEST_INPUT )){
       String jsonData = request->getParam(DATA_REQUEST_INPUT)->value();
       Serial.print(" JSON Data ");

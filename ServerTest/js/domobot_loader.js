@@ -99,7 +99,7 @@ parser = ( att_array, obj )=>{
         return parser( att_array, obj[att]);
     }else{
         if( !obj ){
-            console.log("OBJ Undefined");
+            //console.log("OBJ Undefined");
             return "";
         }
         if (typeof (obj[att_array]) == "number"){
@@ -120,14 +120,16 @@ bindNipple = () => {
             function(evt, data) {
     }
     ).on('pressure', function(evt, data) {
-
-    });
+        console.log(data);
+    }).on('end', function(evt, data) {
+        console.log("STOP");
+        stopBot();
+    })
 }
 
 createNipple = (evt) => {
     var type = typeof evt === 'string' ?
         evt : evt.target.getAttribute('data-type');
-
     joystick = nipplejs.create(joysticks['static']);
     bindNipple();
 }
@@ -158,6 +160,11 @@ domoData = ( data ) => {
     HTTPRequest( "domobot", "botData" , dataJSON );
 }
 
+stopBot = () =>{
+    const dataJSON = { event: "STOP" };
+    HTTPRequest( "domobot", "botData" , dataJSON );
+}
+
 HTTPRequest = ( endpoint, data_endpoint , dataJSON , method = "GET" )=>{
     const xhr = new XMLHttpRequest();
     
@@ -172,7 +179,7 @@ HTTPRequest = ( endpoint, data_endpoint , dataJSON , method = "GET" )=>{
                 // console.log(xhr.response);
             }
         } else {
-            console.error('Error!');
+            console.warn('No request processed!', xhr.status);
         }
     };
     xhr.open( method, endpoint+"?"+data_endpoint+"=" + JSON.stringify(dataJSON), true);

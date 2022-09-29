@@ -1,17 +1,18 @@
 
-
-enum wheelStatus { FWD, BCK, TURNLEFT, TURNRIGHT, TURNL, TURNR, POWEROFF };
-
 class MotorController{
   public:
       EncoderStepCounter *Right_Encoder;
       EncoderStepCounter *Left_Encoder;
       WheelController *left_wheel;
       WheelController *right_wheel;
+
+      int leftWheel_power = 0;
+      int rightWheel_power = 0;
       
       wheelStatus currentStatus = POWEROFF;
       
-      //_f_motor controller = &MotorController::wheels; //Loop Controller Function
+      typedef void ( MotorController::*_f_motor )( );
+      _f_motor controller = &MotorController::idle; //Loop Controller Function
       
       MotorController( ){
         
@@ -65,24 +66,34 @@ class MotorController{
           ledcWrite (RIGHT_WHEEL_PWM_Ch, 0);
           ledcWrite (LEFT_WHEEL_PWM_Ch, 0);
         #endif
-        //attachInterrupt(EncoderPin_A, Right_Encoder->tick() , CHANGE);
-        //attachInterrupt(EncoderPin_B, Right_Encoder->tick() , CHANGE);
-        //attachInterrupt(IntPin_B, interrupt, CHANGE);
+      }
+
+      void powerWheels( int left_power, int right_power ){
+        leftWheel_power = map ( left_power, 0, MAX_POWER, 0, 1023 );
+        rightWheel_power = map ( right_power, 0, MAX_POWER, 0, 1023 );
       }
       
       void move( int power, float theta ){
-        Serial.print("MOVE: ");
           int analogPower = map ( power, 0, MAX_POWER, 0, 1023 );
           int analogTheta = map ( theta, 0, 360, 0, 1023 );
-          Lspeed = analogPower;
-          Rspeed = analogPower;
-          //Serial.println( analogPower );
-          wheels( FWD );
+          
+          int left_power = analogPower;
+          int right_power = analogPower;
+          
+          wheels( FORWARD );
       
          #if defined(ESP32)
-            ledcWrite (RIGHT_WHEEL_PWM_Ch, Rspeed);
-            ledcWrite (LEFT_WHEEL_PWM_Ch, Lspeed);
+            ledcWrite (RIGHT_WHEEL_PWM_Ch, right_power);
+            ledcWrite (LEFT_WHEEL_PWM_Ch, left_power);
          #endif
+      }
+
+      void moveclock( uint8_t dir ){
+        
+      }
+
+      void idle( ){
+        
       }
 
       void wheels( wheelStatus status ){
@@ -92,22 +103,22 @@ class MotorController{
             case POWEROFF:
               setWheelsDir( 0, 0 );
             break;
-            case FWD:
+            case FORWARD:
               setWheelsDir( 1, 1 );
             break;
-            case BCK:
+            case BACKWARD:
               setWheelsDir( -1, -1 );
             break;
-            case TURNLEFT:
+            case LEFT:
               setWheelsDir( -1, 1 );
             break;
-            case TURNRIGHT:
+            case RIGHT:
               setWheelsDir( 1, -1 );
             break;
-            case TURNL:
+            case LTURN:
               setWheelsDir( 0, 1 );
             break;
-            case TURNR:
+            case RTURN:
               setWheelsDir( 1, 0 );
             break;
           }
@@ -118,49 +129,16 @@ class MotorController{
         left_wheel->wheel( _left_dir );
         right_wheel->wheel( _right_dir );
       }
+
+      void run(){
+        (this->*controller)();
+        #if defined(ESP32)
+            ledcWrite (RIGHT_WHEEL_PWM_Ch, rightWheel_power);
+            ledcWrite (LEFT_WHEEL_PWM_Ch, leftWheel_power);
+         #endif
+      }
 };
 
-
-void MoverDch (bool DerAvz, bool DerRet, int DSpeed){
-
-}
-void MoverIzq(bool IzqAvz, bool IzqRet, int ISpeed){
-
-}
-
-void giraDch () {
-  MoverDch ( 0, 1, 400);
-  MoverIzq ( 1, 0, 400);
-  delay (150);
-}
-void giraIzq () {
-  MoverDch ( 1, 0, 400);
-  MoverIzq ( 0, 1, 400);
-  delay (150);
-}
-void paroMotores () {
-  MoverDch ( 0, 0, 0);
-  MoverIzq ( 0, 0, 0);
-}
-
-void salidaMotores () {
-    if (Lspeed < 0) {
-
-  } else {
-
-  }
-  if (Rspeed < 0) {
-
-  } else {
-
-  }
-  Lspeed = abs(Lspeed);  if (Lspeed < 30) Lspeed = 0;
-  Rspeed = abs(Rspeed);  if (Rspeed < 30) Rspeed = 0;
-  Lspeed = constrain (Lspeed, 0, 1023);
-  Rspeed = constrain (Rspeed, 0, 1023);
-
-  // Serial.print ("L  "); Serial.print (Lspeed); Serial.print ("R  "); Serial.println(Rspeed);
-}
 
 void xyAdiferencial()
 {
@@ -172,7 +150,7 @@ void xyAdiferencial()
   // valor diferencial para girar
   turnDelta = map ( pad_x, MIN_RAW_ADC, MAX_RAW_ADC, MIN_TURN_DELTA, MAX_TURN_DELTA );
 
-  Lspeed = baseSpeed + turnDelta;
-  Rspeed = baseSpeed - turnDelta;
+  //Lspeed = baseSpeed + turnDelta;
+  //Rspeed = baseSpeed - turnDelta;
 
 }
