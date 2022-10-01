@@ -1,6 +1,5 @@
 #if defined(ESP32)
   #include <WiFi.h>
-  #include <mDNS.h>
 #endif
 
 #if defined(ESP8266)
@@ -9,15 +8,15 @@
 #endif
 
 #if defined(ESP8266)
-  WiFiEventHandler wifiConnectHandler;
-  WiFiEventHandler wifiDisconnectHandler;
+WiFiEventHandler wifiConnectHandler;
+WiFiEventHandler wifiDisconnectHandler;
 #endif
 
-#if WIFIMANAGER 
-  #include "ESPAsync_WiFiManager.h" 
+#if WIFIMANAGER
+#include "ESPAsync_WiFiManager.h"
 
-  ESPAsync_WMParameter  custom_sleep("SleepMode", "Sleep Mode", SLEEP_TIME, 20);
-  ESPAsync_WiFiManager wifiManager(&server,&dns);
+ESPAsync_WMParameter  custom_sleep("SleepMode", "Sleep Mode", SLEEP_TIME, 20);
+ESPAsync_WiFiManager wifiManager(&server, &dns);
 #endif
 
 Ticker wifiReconnectTimer;
@@ -25,22 +24,22 @@ Ticker wifiReconnectTimer;
 void connectToWifi() {
   Serial.println("Wi-Fi ...");
   WiFi.mode(WIFI_STA);
-  #if WIFIMANAGER 
+  #if WIFIMANAGER
     Serial.println("Connecting to WifiManager...");
     wifiManager.addParameter(&custom_sleep);
-    
+  
     bool wifiManagerConnected = wifiManager.autoConnect(WIFI_HOST);
-    
-    if( wifiManagerConnected ){
-        Serial.println("Async WifiManager On");
-        Serial.print("Connected to Wifi - Local IP : ");
-        // Configures static IP address
-        if (!WiFi.config(LOCAL_IP, GATEWAY, SUBNET, PRIMARYDNS, SECONDARYDNS)) {
-          Serial.println("STA Failed to configure");
-        }
+  
+    if ( wifiManagerConnected ) {
+      Serial.println("Async WifiManager On");
+      Serial.print("Connected to Wifi - Local IP : ");
+      // Configures static IP address
+      if (!WiFi.config(LOCAL_IP, GATEWAY, SUBNET, PRIMARYDNS, SECONDARYDNS)) {
+        Serial.println("STA Failed to configure");
+      }
     }
     else {
-        Serial.println("Configportal running");
+      Serial.println("Configportal running");
     }
     while (WiFi.waitForConnectResult() != WL_CONNECTED) {
       Serial.println("Connection Failed! Rebooting...");

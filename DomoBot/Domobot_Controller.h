@@ -175,8 +175,6 @@ class DomoBot : public Domo {
          if ( currentPassage < 0 ) return;
          wheelStatus passageStatusList[] = { FORWARD, RIGHT, UNKNOWN, RIGHT, LEFT, FORWARD, LEFT, POWEROFF };
          wheelStatus nextStatus = passageStatusList[ currentPassage ];
-         Serial.print( "Passage : " );Serial.print( currentPassage );Serial.print( " Status : " );
-         Serial.println( nextStatus );
          if ( nextStatus == UNKNOWN ){  // FRONTWALL CASE - Decision taken to move RIGHT OR LEFT
               if( OPT->emittersQueue[1]->position == OPTO_LEFT ){
                 nextStatus = LEFT;
@@ -196,7 +194,7 @@ class DomoBot : public Domo {
     }
     
     void stop(){
-      motors.move( 0, 0 );
+      motors.move( 0 );
       calculate_position();
       controller = &DomoBot::idle;
     }
