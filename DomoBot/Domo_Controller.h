@@ -1,18 +1,16 @@
-enum modes { UNDEF, JOYSTICK, STOP, OFF };
-enum movement { DISCRETE, CONTINUOUS, INCREMENTAL, RELATIVE, ABSOLUTE };
+enum modes { UNDEF, JOYSTICK, AUTO, STOP, OFF, TEST  };
+enum movement { DISCRETE, CONTINUOUS, RELATIVE, ABSOLUTE};
 enum autonomy { MANUAL, AUTOMATIC };
-enum wheelStatus { FORWARD, BACKWARD, LTURN, RTURN, LEFT, RIGHT, POWEROFF };
+enum wheelStatus { FORWARD = 1, BACKWARD = -1, LTURN = 4, RTURN = 5, LEFT = 2, RIGHT = 3, LTURNBACK = 6, RTURNBACK = 7, POWEROFF = 0, UNKNOWN = -2 };
 
 struct statusBot{
   uint8_t power = 100;
   float theta = 0;
   uint8_t dir = 0;
-  wheelStatus wheels = POWEROFF;
-  
-  modes controller = OFF;
-  autonomy autobot = MANUAL;
+  autonomy autobot = AUTOMATIC;
+  modes controller = AUTO;
   movement movemode = CONTINUOUS;
-  
+  wheelStatus wheels = POWEROFF;
   String mode;
   uint16_t latency;
 };
@@ -59,6 +57,27 @@ class Domo{
         String message(messageArray);
         
         setDomoStatus( message );
+      }
+
+      if (domoJSON.hasOwnProperty("auto")) {
+        bool automode = (bool) domoJSON["auto"];
+        if( automode ){
+          this->currentStatus.autobot = AUTOMATIC;
+          this->currentStatus.controller = AUTO;
+        }else{
+          this->currentStatus.autobot = MANUAL;
+          this->currentStatus.controller = JOYSTICK;
+        }
+      }
+
+      if (domoJSON.hasOwnProperty("movemode")) {
+        bool movemode = (bool) domoJSON["movemode"];
+        this->currentStatus.controller = JOYSTICK;
+        if( movemode ){
+          this->currentStatus.movemode = CONTINUOUS;
+        }else{
+          this->currentStatus.movemode = DISCRETE;
+        }
       }
 
       if (domoJSON.hasOwnProperty("direction")) {

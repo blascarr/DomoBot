@@ -35,18 +35,18 @@ long IMU_time_interval = 20;
 #define IMU_DEBUG false
 
 // Pinout OPT
-#define OPTO false
+#define OPTO true
+#define OPTO_SENSORS 3
+int OPTO_SECURITY_DISTANCE = 120;
+
 #define OPTO_DEBUG false
+#define PASSAGE_DEBUG false
 
 //  Variables modo, velocidad y JOYSTICK
 int MAX_POWER = 50;
 
 int mode;
 int pad_x, pad_y;
-
-//Arrays amplitud y distancia OPT3101
-uint16_t amplitudes[3];
-int16_t distances[3];
 
 // Constantes para trasladar los datos en bruto del joystick pad_x pad_y
 // a velocidades en cada rueda RSpeed LSpeed

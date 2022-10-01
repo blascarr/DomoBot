@@ -65,8 +65,11 @@
 
         "toggle_class":"slider round",
         "toggle_control_id": "toggle_control",
-        "toggle_retain_id": "toggle_retain"
-
+        "toggle_retain_id": "toggle_retain",
+        "toggle_control_label": "Automatic Mode",
+        "toggle_retain_label": "Continuous Move",
+        "toggle_class_label": "switch_label",
+        "toggle_class_switch": "switch"
     },
     "template":{"<>":"div","class":"container","html":[
         {"<>":"div","id":"${joystick_id}","class":"${joystick_class}","html":[
@@ -123,13 +126,20 @@
                 {"<>":"div", "class":"${class_inline}","html":"${distance_label}"},
                 {"<>":"div", "id":"${distance_id}", "class":"${class_inline}","html":"${distance_value}"}
             ]},
-            {"<>":"label","class":"switch","html":[
-                {"<>":"input", "id":"${toggle_retain_id}", "type":"checkbox","checked":"","html":""},
-                {"<>":"span","class":"${toggle_class}","html":""}
+            {"<>":"div","html":[
+                {"<>":"div","class": "${toggle_class_label}","html":"${toggle_retain_label}"},
+                {"<>":"label","class":"${toggle_class_switch}","html":[
+                    {"<>":"input", "id":"${toggle_retain_id}", "type":"checkbox","checked":"","html":""},
+                    {"<>":"span","class":"${toggle_class}","html":""}
+                ]}
             ]},
-            {"<>":"label","class":"switch","html":[
-                {"<>":"input", "id":"${toggle_control_id}", "type":"checkbox","checked":"","html":""},
-                {"<>":"span","class":"${toggle_class}","html":""}
+            {"<>":"div","html":[
+                {"<>":"div","class": "${toggle_class_label}","html":"${toggle_control_label}"},
+                {"<>":"label","class":"${toggle_class_switch}","html":[
+                    
+                    {"<>":"input", "id":"${toggle_control_id}", "type":"checkbox","checked":"","html":""},
+                    {"<>":"span","class":"${toggle_class}","html":""}
+                ]}
             ]}
         ]}
     ]}

@@ -15,6 +15,7 @@ WheelController Right_Wheel( RIGHT_WHEEL_PWM , RIGHT_WHEEL_IN1 , RIGHT_WHEEL_IN2
 
 #include "Motor_Controller.h" 
 #include "PID_Controller.h"
+
 void RightInterrupt() {
   Right_Encoder.tick();
 }
@@ -33,15 +34,16 @@ class DomoBot : public Domo {
     int last_rightPos, last_leftPos;
     long wheelR_position, wheelL_position;
     long bot_position;
+    int opto_distance = 300;
     
     #if IMU_ENABLE 
       IMU mpu;
     #endif
     
     #if OPTO
-      OPT3101 OPT;
+      LIDAR *OPT;
     #endif
-
+    
     DomoBot( uint16_t motor_config ): Domo(){
     
     }
@@ -64,18 +66,9 @@ class DomoBot : public Domo {
       #endif
 
       #if OPTO
-        sensor.init();
-        if (sensor.getLastError())
-        {
-          Serial.print(F("Failed to initialize OPT3101: error "));
-          Serial.println(sensor.getLastError());
-          while (1) {}
-        }
-        sensor.setFrameTiming(256);
-        sensor.setChannel(0);
-        sensor.setBrightness(OPT3101Brightness::Adaptive);
-        sensor.startSample();
+        OPT->begin();
       #endif
+      setDomo();
     }
 
     void loop(){
@@ -84,12 +77,14 @@ class DomoBot : public Domo {
       #if IMU_ENABLE 
         mpu.updateIMU();
       #endif
-
-      #if OPTO
-        lecturasOPT();
-      #endif
     }
-
+    
+    #if OPTO
+        void setOpto( LIDAR &opto ){
+            OPT = &opto;
+        }
+    #endif
+    
     void idle(){
       if( millis() - run_millis >= this->currentStatus.latency ){
         run_millis = millis();
@@ -99,28 +94,26 @@ class DomoBot : public Domo {
 
     void setDomo(){
       switch (this->currentStatus.controller) {
+        case AUTO:
+            controller = &DomoBot::autonomous;
+        break;
         case JOYSTICK:
             if( this->currentStatus.movemode == DISCRETE ){
-              if( this->currentStatus.wheels != motors.currentStatus ){
                 motors.powerWheels( this->currentStatus.power , this->currentStatus.power );
-                
-                switch ( this->currentStatus.dir  ){
-                  case 0 :
-                    motors.wheels( FORWARD );
-                  break;
-                  case 2 :
-                    motors.wheels( RIGHT );
-                  break;
-                  case 4 :
-                    motors.wheels( BACKWARD );
-                  break;
-                  case 6 :
-                    motors.wheels( LEFT );
-                  break;
-                }
+                /*
+                 * case 0:   // TOP             Status = FORWARD;
+                 * case 1:   // TOP_RIGHT       Status = FORWARD-RIGHT;
+                 * case 2:   // RIGHT           Status = RIGHT;
+                 * case 3:   // BOTTOM_RIGHT    Status = RIGHT;
+                 * case 4:   // BOTTOM          Status = BACKWARD;
+                 * case 5:   // BOTTOM_LEFT     Status = BACKWARD;
+                 * case 6:   // LEFT            Status = LEFT;
+                 * case 7:   // TOP_LEFT        Status = LEFT;
+                 */
+                wheelStatus joystick_directionList[] = { FORWARD, FORWARD, RIGHT, RIGHT, BACKWARD, BACKWARD, LEFT, LEFT };
+                motors.setStatus( joystick_directionList[ this->currentStatus.dir ]);
                 
                 controller = &DomoBot::discreteMovement;
-              }
             }
             
             if( this->currentStatus.movemode == CONTINUOUS ){
@@ -128,17 +121,16 @@ class DomoBot : public Domo {
               float theta_offset = this->currentStatus.theta + offset;
               float power_left = this->currentStatus.power*sin( theta_offset*PI/180 );
               float power_right = this->currentStatus.power*cos( theta_offset*PI/180 );
-              Serial.print("L : ");
-              Serial.print( power_left );
-              Serial.print(" R : ");
-              Serial.println( power_right );
               motors.setWheelsPower( power_left , power_right , true );
               controller = &DomoBot::continuousMovement;
             }
-            if( this->currentStatus.movemode == INCREMENTAL ){
-              controller = &DomoBot::incrementalMovement;
-            }
             break;
+        case TEST:
+          Serial.println( "Test Mode");
+          motors.powerWheels(50 , 50);
+          motors.setStatus(LTURNBACK);
+          controller = &DomoBot::testMovement;
+        break;
         case STOP:
             controller = &DomoBot::stop;
             break;
@@ -151,11 +143,6 @@ class DomoBot : public Domo {
       }
     };
 
-    void manualMovement(){
-      motors.move( this->currentStatus.power, this->currentStatus.theta );
-      calculate_position();
-    }
-
     void discreteMovement(){
       motors.run();
       calculate_position();
@@ -166,8 +153,45 @@ class DomoBot : public Domo {
       calculate_position();
     }
 
-    void incrementalMovement(){
-      motors.move( this->currentStatus.power, this->currentStatus.theta );
+    void testMovement(){
+      motors.run();
+      calculate_position();
+    }
+
+    void autonomous(){
+      #if OPTO
+        /*
+         * case 0:   // FREE          nextStatus = FORWARD;
+         * case 1:   // LEFT_EDGE     nextStatus = RIGHT;
+         * case 2:   // FRONTWALL     nextStatus = UNKNOWN;    if( OPT->emittersQueue[1]->position == OPTO_LEFT ){ nextStatus = LEFT;} else nextStatus = RIGHT;
+         * case 3:   // LEFT_CORNER   nextStatus = RIGHT;
+         * case 4:   // RIGHT_EDGE    nextStatus = LEFT;
+         * case 5:   // BOTTLENECK    nextStatus = FORWARD;
+         * case 6:   // RIGHT_CORNER  nextStatus = LEFT;
+         * case 7:   // DEAD_END      nextStatus = POWEROFF;
+         * case -1:   // NOREAD        OPTO SAMPLE NOT READ
+         */
+         PASSAGE currentPassage = OPT->read();
+         if ( currentPassage < 0 ) return;
+         wheelStatus passageStatusList[] = { FORWARD, RIGHT, UNKNOWN, RIGHT, LEFT, FORWARD, LEFT, POWEROFF };
+         wheelStatus nextStatus = passageStatusList[ currentPassage ];
+         Serial.print( "Passage : " );Serial.print( currentPassage );Serial.print( " Status : " );
+         Serial.println( nextStatus );
+         if ( nextStatus == UNKNOWN ){  // FRONTWALL CASE - Decision taken to move RIGHT OR LEFT
+              if( OPT->emittersQueue[1]->position == OPTO_LEFT ){
+                nextStatus = LEFT;
+              }else{
+                nextStatus = RIGHT;
+              }
+          }
+          
+          bool statusChange = motors.setStatus( nextStatus );
+          
+          if( statusChange ){
+            motors.move( MAX_POWER );
+          }
+      #endif
+      motors.run();
       calculate_position();
     }
     
@@ -176,7 +200,7 @@ class DomoBot : public Domo {
       calculate_position();
       controller = &DomoBot::idle;
     }
-    
+
     void calculate_position(){
       encoder_update();
       if( last_rightPos != 0 || last_leftPos != 0 ){
@@ -222,35 +246,3 @@ class DomoBot : public Domo {
         }
     }
 };
-
-void esquivaObstaculos ()
-{
-  if (distances[0] && distances[1] && distances[2] > 300)
-  {
-    //MoverDch ( 1, 0, 1000);
-    //MoverIzq ( 1, 0, 1000);
-  }
-  if (distances[0] && distances[1] && distances[2] < 300)
-  {
-   // MoverDch ( 1, 0, 800);
-    //MoverIzq ( 1, 0, 800);
-  }
-  if (distances[0] && distances[1] && distances[2] < 200)
-  {
-    //MoverDch ( 1, 0, 600);
-    //MoverIzq ( 1, 0, 600);
-  }
-  if (distances[1] < 120  )
-  {
-    //if (distances [0] <= distances [2]) giraDch ();
-    //else giraIzq ();
-  }
-  if (distances[0] < 110 )
-  {
-    //MoverIzq ( 1, 0, 600);
-  }
-  if ( distances[2] < 110 )
-  {
-    //MoverDch ( 1, 0, 600);
-  }
-}

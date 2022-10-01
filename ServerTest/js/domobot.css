@@ -19,6 +19,10 @@ h3,h4{
 
 }
 
+.switch_label{
+    display: inline-block;
+}
+
 .switch {
     position: relative;
     display: inline-block;

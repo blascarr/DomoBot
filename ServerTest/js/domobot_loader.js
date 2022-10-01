@@ -4,6 +4,8 @@ let dumpContainer;
 let els;
 let joysticks ;
 var nbEvents = 0;
+const domo_endpoint = "domobot";
+const domo_input_endpoint = "botData";
 
 // Mapping Keys
 const keys = {
@@ -65,6 +67,25 @@ $(function () {
         };
 
         createNipple('static'); 
+
+        bindUIEvents = () => {
+            
+            $('#toggle_retain').click(
+                function() {
+                    const [toggle_mode] = $('#toggle_retain')
+                    HTTPRequest( domo_endpoint , domo_input_endpoint, {"movemode":  toggle_mode.checked} );
+                }
+            );
+
+            $('#toggle_control').click(
+                function() {
+                    const [auto_mode] = $('#toggle_control')
+                    HTTPRequest( domo_endpoint , domo_input_endpoint, {"auto":  auto_mode.checked} );
+                }
+            );
+        }
+
+        bindUIEvents();
 
     }).fail(function() {
         console.log( "error getting JSON" );
@@ -149,20 +170,14 @@ domget = (dom) => {
 }
 
 domoData = ( data ) => {
-    const [toggle] = $('#toggle_retain');
-    let controlmode = ""; 
-    if ( toggle.checked ){
-        controlmode = "joystick"
-    }else{
-        controlmode = "move"
-    }
+    let controlmode = "joystick"   
     let dataJSON = { power: data.distance, angle: data.angle, direction: data.direction, mode: controlmode };
-    HTTPRequest( "domobot", "botData" , dataJSON );
+    HTTPRequest( domo_endpoint, domo_input_endpoint , dataJSON );
 }
 
 stopBot = () =>{
     const dataJSON = { event: "STOP" };
-    HTTPRequest( "domobot", "botData" , dataJSON );
+    HTTPRequest( domo_endpoint, domo_input_endpoint , dataJSON );
 }
 
 HTTPRequest = ( endpoint, data_endpoint , dataJSON , method = "GET" )=>{

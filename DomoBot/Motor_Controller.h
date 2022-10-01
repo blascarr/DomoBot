@@ -72,6 +72,15 @@ class MotorController{
         leftWheel_power = map ( left_power, 0, MAX_POWER, 0, 1023 );
         rightWheel_power = map ( right_power, 0, MAX_POWER, 0, 1023 );
       }
+
+      void move( int power ){
+          int PWMPower = map ( power, 0, MAX_POWER, 0, 1023 );
+      
+         #if defined(ESP32)
+            ledcWrite (RIGHT_WHEEL_PWM_Ch, PWMPower);
+            ledcWrite (LEFT_WHEEL_PWM_Ch, PWMPower);
+         #endif
+      }
       
       void move( int power, float theta ){
           int analogPower = map ( power, 0, MAX_POWER, 0, 1023 );
@@ -79,8 +88,6 @@ class MotorController{
           
           int left_power = analogPower;
           int right_power = analogPower;
-          
-          wheels( FORWARD );
       
          #if defined(ESP32)
             ledcWrite (RIGHT_WHEEL_PWM_Ch, right_power);
@@ -92,7 +99,7 @@ class MotorController{
         
       }
 
-      void wheels( wheelStatus status ){
+      bool setStatus( wheelStatus status ){
         if( status != currentStatus){
           currentStatus = status;
           switch (currentStatus){
@@ -117,7 +124,16 @@ class MotorController{
             case RTURN:
               setWheelsDir( 1, 0 );
             break;
+            case LTURNBACK:
+              setWheelsDir( -1, 0 );
+            break;
+            case RTURNBACK:
+              setWheelsDir( 0, -1 );
+            break;
           }
+          return true;
+        }else{
+          return false;
         }
       }
 
@@ -150,19 +166,3 @@ class MotorController{
          #endif
       }
 };
-
-
-void xyAdiferencial()
-{
-  int baseSpeed;
-  int turnDelta;
-
-  // velocidad base
-  baseSpeed = map ( pad_y, MIN_RAW_ADC, MAX_RAW_ADC, MAX_SPEED_SETTING, MIN_SPEED_SETTING );
-  // valor diferencial para girar
-  turnDelta = map ( pad_x, MIN_RAW_ADC, MAX_RAW_ADC, MIN_TURN_DELTA, MAX_TURN_DELTA );
-
-  //Lspeed = baseSpeed + turnDelta;
-  //Rspeed = baseSpeed - turnDelta;
-
-}
