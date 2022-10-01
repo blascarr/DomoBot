@@ -68,6 +68,13 @@ class MotorController{
         #endif
       }
 
+      void writeWheels( int left_power, int right_power ){
+        #if defined(ESP32)
+            ledcWrite (LEFT_WHEEL_PWM_Ch, left_power);
+            ledcWrite (RIGHT_WHEEL_PWM_Ch, right_power);
+         #endif
+      }
+
       void powerWheels( int left_power, int right_power ){
         leftWheel_power = map ( left_power, 0, MAX_POWER, 0, 1023 );
         rightWheel_power = map ( right_power, 0, MAX_POWER, 0, 1023 );
@@ -75,24 +82,12 @@ class MotorController{
 
       void move( int power ){
           int PWMPower = map ( power, 0, MAX_POWER, 0, 1023 );
-      
-         #if defined(ESP32)
-            ledcWrite (RIGHT_WHEEL_PWM_Ch, PWMPower);
-            ledcWrite (LEFT_WHEEL_PWM_Ch, PWMPower);
-         #endif
+          writeWheels( PWMPower, PWMPower );
       }
-      
-      void move( int power, float theta ){
-          int analogPower = map ( power, 0, MAX_POWER, 0, 1023 );
-          int analogTheta = map ( theta, 0, 360, 0, 1023 );
-          
-          int left_power = analogPower;
-          int right_power = analogPower;
-      
-         #if defined(ESP32)
-            ledcWrite (RIGHT_WHEEL_PWM_Ch, right_power);
-            ledcWrite (LEFT_WHEEL_PWM_Ch, left_power);
-         #endif
+
+      void move( int left_power, int right_power ){
+          powerWheels( left_power , right_power);
+          writeWheels( leftWheel_power, rightWheel_power );
       }
 
       void idle( ){
@@ -160,9 +155,6 @@ class MotorController{
 
       void run(){
         (this->*controller)();
-        #if defined(ESP32)
-            ledcWrite (RIGHT_WHEEL_PWM_Ch, rightWheel_power);
-            ledcWrite (LEFT_WHEEL_PWM_Ch, leftWheel_power);
-         #endif
+        writeWheels( leftWheel_power, rightWheel_power );
       }
 };
