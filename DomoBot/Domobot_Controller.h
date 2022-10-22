@@ -37,7 +37,7 @@ class DomoBot : public Domo {
     MotorController motors;
     int last_rightPos, last_leftPos;
     long wheelR_position, wheelL_position;
-    long bot_position;
+    float x, y, theta;
     int opto_distance = 300;
     
     #if IMU_ENABLE 
@@ -208,22 +208,40 @@ class DomoBot : public Domo {
         Left_Encoder.reset();
         Right_Encoder.reset();
 
+        
         //Send Position to /map_events endpoint
         eventSource->send(getReadings().c_str(), MAP_STREAM , millis());
+        int diff =  wheelL_position - wheelR_position ;
+        int sum =  ( wheelL_position + wheelR_position );
+        float v_sum = sum*PI*WHEEL_DIAMETER/MOTOR_STEPS;
+        float v_diff = diff*PI*WHEEL_DIAMETER/MOTOR_STEPS;
         
-        #if DOMOBOT_DEBUG
+        theta = v_diff/WHEELS_DISTANCE;
+        float theta_deg = theta*180/PI;
+        
+        x = v_sum/2*cos( theta );
+        y = v_sum/2*sin( theta );
+        
+        #if DOMOBOT_POSE
           Serial.print("Right Wheel: ");
           Serial.print( wheelR_position);
           Serial.print(" - Left Wheel: ");
           Serial.print(wheelL_position);
-          Serial.print(" -> Current Position: ");
-          Serial.println( bot_position );
+          Serial.print(" -> Current Position: X - ");
+          Serial.print( x );
+          Serial.print("\t Y - ");
+          Serial.print( y );
+          Serial.print("\t O - ");
+          Serial.println( theta_deg );
         #endif
       }
     }
 
     String getReadings(){
       JSONVar bot_info;
+      bot_info["x"] = String( x );
+      bot_info["y"] = String( y );
+      bot_info["theta"] = String( theta );
       bot_info["wheelR"] = String( wheelR_position );
       bot_info["wheelL"] = String( wheelL_position );
       return JSON.stringify( bot_info );
