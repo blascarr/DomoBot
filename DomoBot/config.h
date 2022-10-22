@@ -12,6 +12,15 @@ char DOMOLAMP_ID  [BOT_ID_LEN]   = "D0M0B0T";
 #define LEFT_WHEEL_IN2      16
 
 #define DOMOBOT_DEBUG false
+#define DOMOBOT_POSE true
+// DOMOBOT SPECS [mm]
+
+#define CATERPILLAR_WIDTH   19
+#define DOMOBOT_WIDTH       98
+#define DOMOBOT_LENGTH      86
+#define WHEEL_DIAMETER      39
+#define MOTOR_STEPS         1040  // [Steps/revolution]
+const int WHEELS_DISTANCE = DOMOBOT_WIDTH - CATERPILLAR_WIDTH;
 
 // Setup PWM ESP32
 const int LEFT_WHEEL_PWM_Ch = 0;
@@ -47,15 +56,6 @@ int MAX_POWER = 50;
 
 int mode;
 int pad_x, pad_y;
-
-// Constantes para trasladar los datos en bruto del joystick pad_x pad_y
-// a velocidades en cada rueda RSpeed LSpeed
-const int MIN_RAW_ADC = 0;
-const int MAX_RAW_ADC = 100;
-const int MAX_SPEED_SETTING =  1023;
-const int MIN_SPEED_SETTING = -MAX_SPEED_SETTING;
-const int MAX_TURN_DELTA =  512; // velocidad maxima [in/de]crease a girar; Left
-const int MIN_TURN_DELTA = -MAX_TURN_DELTA; // Right
 
 // Valores para encoder e ISR
 const int timeThreshold = 2;
