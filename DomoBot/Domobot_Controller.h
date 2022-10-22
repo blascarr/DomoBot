@@ -210,8 +210,8 @@ class DomoBot : public Domo {
         
         //Send Position to /map_events endpoint
         eventSource->send(getReadings().c_str(), MAP_STREAM , millis());
-        int diff =  wheelL_position - wheelR_position ;
-        int sum =  ( wheelL_position + wheelR_position );
+        int diff =  last_leftPos - last_rightPos ;
+        int sum =  ( last_leftPos + last_rightPos );
         float v_sum = sum*PI*WHEEL_DIAMETER/MOTOR_STEPS;
         float v_diff = diff*PI*WHEEL_DIAMETER/MOTOR_STEPS;
         

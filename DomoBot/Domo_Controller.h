@@ -7,8 +7,8 @@ struct statusBot{
   uint8_t power = 100;
   float theta = 0;
   uint8_t dir = 0;
-  autonomy autobot = AUTOMATIC;
-  modes controller = AUTO;
+  autonomy autobot = MANUAL;
+  modes controller = STOP;
   movement movemode = CONTINUOUS;
   wheelStatus wheels = POWEROFF;
   String mode;
