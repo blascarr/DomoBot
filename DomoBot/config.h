@@ -88,7 +88,8 @@ bool IsCW_R = true;
 #define DATA_REQUEST_INPUT "botData"
 #define MAP_EVENTS_ENDPOINT "/map_events"
 #define MAP_STREAM "map_data"
-
+long server_millis;
+long server_latency = 200;
 // STREAM CONFIG
 #define STREAM_CHARLENGTH 4
 #define SERIAL_CONTROL true

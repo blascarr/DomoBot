@@ -208,9 +208,6 @@ class DomoBot : public Domo {
         Left_Encoder.reset();
         Right_Encoder.reset();
 
-        
-        //Send Position to /map_events endpoint
-        eventSource->send(getReadings().c_str(), MAP_STREAM , millis());
         int diff =  wheelL_position - wheelR_position ;
         int sum =  ( wheelL_position + wheelR_position );
         float v_sum = sum*PI*WHEEL_DIAMETER/MOTOR_STEPS;
@@ -222,6 +219,7 @@ class DomoBot : public Domo {
         x = v_sum/2*cos( theta );
         y = v_sum/2*sin( theta );
         
+        sendServerPose();
         #if DOMOBOT_POSE
           Serial.print("Right Wheel: ");
           Serial.print( wheelR_position);
@@ -237,6 +235,14 @@ class DomoBot : public Domo {
       }
     }
 
+    void sendServerPose(){
+      if( millis() - server_millis >= server_latency ){
+        server_millis = millis();
+        //Send Position to /map_events endpoint
+        eventSource->send(getReadings().c_str(), MAP_STREAM , millis());
+      }
+    }
+    
     String getReadings(){
       JSONVar bot_info;
       bot_info["x"] = String( x );
