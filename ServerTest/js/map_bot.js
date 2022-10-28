@@ -19,6 +19,8 @@ const objectScaleV = gridSizeV;
 let container;
 let camera, controls, scene, projector, renderer;
 let plane;
+var geometry = new THREE.CubeGeometry( 1, 1, 1 );
+var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0x0ab86b } ) );
 
 init();
 animate();
@@ -44,9 +46,6 @@ function init() {
 }
 
 function setBot(){
-    var geometry = new THREE.CubeGeometry( 1, 1, 1 );
-    var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0x0ab86b } ) );
-
     object.material.ambient = object.material.color;
 
     object.position.x = 50;
@@ -163,8 +162,13 @@ if (!!window.EventSource) {
     source.addEventListener('map_data', function (e) {
         let obj = JSON.parse(e.data);
         console.log(obj);
-
-        
+        object.position.x = obj.x;
+        object.position.y = obj.y;
+        object.updateMatrix ();
+        object.rotation.z = obj.theta;
+        domget("x_pos_data").innerHTML = obj.x;
+        domget("y_pos_data").innerHTML = obj.y;
+        domget("theta_pos_data").innerHTML = (obj.theta*180/Math.PI)%360;
     }, false)
 
 };

@@ -9,16 +9,6 @@
         "position_class":"position",
         "class_inline" : "inline",
 
-        "x_pos_id":"x_pos_data",
-        "x_pos_class":"x data",
-        "x_pos_class_value":"x_pos_data",
-        "x_pos_label":"X : ",
-
-        "y_pos_id":"y_pos_data",
-        "y_pos_class":"y data",
-        "y_pos_class_value":"y_pos_data",
-        "y_pos_label":"Y : ",
-
         "angle_class":"angle",
         "angle_label":"Angle",
 
@@ -32,61 +22,36 @@
         "deg_angle_class":"degree data",
         "deg_angle_label":"Degree : ",
 
-        "force_id":"force",
-        "force_class":"force",
-        "force_label":"Force : ",
-
-        "pressure_id":"pressure",
-        "pressure_class":"pressure",
-        "pressure_label":"Pressure : ",
-
         "distance_id":"distance",
         "distance_class":"distance",
         "distance_label":"Distance : ",
 
-        "direction_id":"direction",
-        "direction_class":"direction",
-        "direction_label":"Direction : ",
-
-        "x_dir_id":"x_dir_data",
-        "x_dir_data":"x_dir_data",
-        "x_dir_class":"x data",
-        "x_dir_label":"X : ",
-
-        "y_dir_id":"y_dir_data",
-        "y_dir_data":"y_dir_data",
-        "y_dir_class":"y data",
-        "y_dir_label":"Y : ",
-
-        "angle_dir_id":"angle_dir_data",
-        "angle_dir_data":"angle_dir_data",
-        "angle_dir_class":"angle data",
-        "angle_dir_label":"Angle : ",
-
         "toggle_class":"slider round",
         "toggle_control_id": "toggle_control",
         "toggle_retain_id": "toggle_retain",
-        "toggle_control_label": "Automatic Mode",
-        "toggle_retain_label": "Continuous Move",
-        "toggle_class_label": "switch_label",
-        "toggle_class_switch": "switch"
+
+        "x_pos_id":"x_pos_data",
+        "x_pos_class":"x data",
+        "x_pos_class_value":"x_pos_data",
+        "x_pos_label":"X : ",
+
+        "y_pos_id":"y_pos_data",
+        "y_pos_class":"y data",
+        "y_pos_class_value":"y_pos_data",
+        "y_pos_label":"Y : ",
+
+        "theta_pos_id":"theta_pos_data",
+        "theta_pos_class":"theta_data",
+        "theta_pos_class_value":"theta_pos_data",
+        "theta_pos_label":"Angle : "
+
     },
     "template":{"<>":"div","class":"container","html":[
         {"<>":"div","id":"${joystick_id}","class":"${joystick_class}","html":[
             {"<>":"h1","html":"${joystick_label}"}
         ]},
-        {"<>":"div","id":"${dump_id}","class":"${x_pos_class}","html":[
-            {"<>":"div","class":"${position_class}","html":[
-                {"<>":"h4","html":"Position"},
-                {"<>":"div", "class":"${x_pos_class}","html":[
-                    {"<>":"div", "class":"${class_inline}","html":"${x_pos_label}"},
-                    {"<>":"div","id":"${x_pos_id}", "class":"${class_inline}","html":"${x_pos_value}"}
-                ]},
-                {"<>":"div","class":"${y_pos_class}","html":[
-                    {"<>":"div", "class":"${class_inline}","html":"${y_pos_label}"},
-                    {"<>":"div","id":"${y_pos_id}", "class":"${class_inline}","html":"${y_pos_value}"}
-                ]}
-            ]},
+        {"<>":"div","id":"${dump_id}","class":"${dump_class}","html":[
+            
             {"<>":"div","class":"${angle_class}","html":[
                 {"<>":"h4","html":"Angle"},
                 {"<>":"div","class":"${rad_angle_class}","html":[
@@ -98,47 +63,33 @@
                     {"<>":"div", "id":"${deg_angle_id}", "class":"${class_inline}","html":"${deg_angle_value}"}
                 ]}
             ]},
-            {"<>":"div", "id":"${direction_id}", "class":"${direction_class}","html":[
-                {"<>":"h4","html":"Direction"},
-                {"<>":"div","class":"${x_dir_class}","html":[
-                    {"<>":"div", "class":"${class_inline}","html":"${x_dir_label}"},
-                    {"<>":"div", "id":"${x_dir_id}", "class":"${class_inline}","html":"${x_dir_value}"}
-                ]},
-                {"<>":"div","class":"${y_dir_class}","html":[
-                    {"<>":"div", "class":"${class_inline}","html":"${y_dir_label}"},
-                    {"<>":"div", "id":"${y_dir_id}", "class":"${class_inline}","html":"${y_dir_value}"}
-                ]},
-                {"<>":"div","class":"${angle_dir_class}","html":[
-                    {"<>":"div", "class":"${class_inline}","html":"${angle_dir_label}"},
-                    {"<>":"div", "id":"${angle_dir_id}", "class":"${class_inline}","html":"${angle_dir_value}"}
-                ]}
-            ]},
+            
             {"<>":"br","html":""},
-            {"<>":"div", "class":"${force_class}","html":[
-                {"<>":"div", "class":"${class_inline}","html":"${force_label}"},
-                {"<>":"div", "id":"${force_id}", "class":"${class_inline}","html":"${force_value}"}
-            ]},
-            {"<>":"div", "class":"${pressure_class}","html":[
-                {"<>":"div", "class":"${class_inline}","html":"${pressure_label}"},
-                {"<>":"div", "id":"${pressure_id}", "class":"${class_inline}","html":"${pressure_value}"}
-            ]},
             {"<>":"div", "class":"${distance_class}","html":[
                 {"<>":"div", "class":"${class_inline}","html":"${distance_label}"},
                 {"<>":"div", "id":"${distance_id}", "class":"${class_inline}","html":"${distance_value}"}
             ]},
-            {"<>":"div","html":[
-                {"<>":"div","class": "${toggle_class_label}","html":"${toggle_retain_label}"},
-                {"<>":"label","class":"${toggle_class_switch}","html":[
-                    {"<>":"input", "id":"${toggle_retain_id}", "type":"checkbox","checked":"","html":""},
-                    {"<>":"span","class":"${toggle_class}","html":""}
-                ]}
+            {"<>":"label","class":"switch","html":[
+                {"<>":"input", "id":"${toggle_retain_id}", "type":"checkbox","checked":"","html":""},
+                {"<>":"span","class":"${toggle_class}","html":""}
             ]},
-            {"<>":"div","html":[
-                {"<>":"div","class": "${toggle_class_label}","html":"${toggle_control_label}"},
-                {"<>":"label","class":"${toggle_class_switch}","html":[
-                    
-                    {"<>":"input", "id":"${toggle_control_id}", "type":"checkbox","checked":"","html":""},
-                    {"<>":"span","class":"${toggle_class}","html":""}
+            {"<>":"label","class":"switch","html":[
+                {"<>":"input", "id":"${toggle_control_id}", "type":"checkbox","checked":"","html":""},
+                {"<>":"span","class":"${toggle_class}","html":""}
+            ]},
+            {"<>":"div","class":"${position_class}","html":[
+                {"<>":"h4","html":"Position"},
+                {"<>":"div", "class":"${x_pos_class}","html":[
+                    {"<>":"div", "class":"${class_inline}","html":"${x_pos_label}"},
+                    {"<>":"div","id":"${x_pos_id}", "class":"${class_inline}","html":"${x_pos_value}"}
+                ]},
+                {"<>":"div","class":"${y_pos_class}","html":[
+                    {"<>":"div", "class":"${class_inline}","html":"${y_pos_label}"},
+                    {"<>":"div","id":"${y_pos_id}", "class":"${class_inline}","html":"${y_pos_value}"}
+                ]},
+                {"<>":"div","class":"${theta_pos_class}","html":[
+                    {"<>":"div", "class":"${class_inline}","html":"${theta_pos_label}"},
+                    {"<>":"div","id":"${theta_pos_id}", "class":"${class_inline}","html":"${theta_pos_value}"}
                 ]}
             ]}
         ]}

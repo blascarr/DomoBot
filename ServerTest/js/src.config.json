@@ -38,5 +38,5 @@
             "link":"js/UIEvents.js"
         }
     ],
-    "domobot_json": "js/domobot_config.json"
+    "config_json": "js/domobot_config.json"
 }

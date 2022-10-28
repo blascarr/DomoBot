@@ -13,5 +13,5 @@
     "timeout_scripts":[
         "https://domo-bot.s3.eu-west-3.amazonaws.com/domobot_loader.js"
     ],
-    "domobot_json": "https://domo-bot.s3.eu-west-3.amazonaws.com/domobot_config.json"
+    "config_json": "https://domo-bot.s3.eu-west-3.amazonaws.com/domobot_config.json"
 }

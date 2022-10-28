@@ -1,28 +1,21 @@
+const domo_endpoint = "domobot";
+const domo_input_endpoint = "botData";
 let elDebug;
 let joystick;
 let dumpContainer;
 let els;
 let joysticks ;
 var nbEvents = 0;
-const domo_endpoint = "domobot";
-const domo_input_endpoint = "botData";
 
 // Mapping Keys
 const keys = {
-    "x_pos_data":"position.x",
-    "y_pos_data":"position.y",
     "rad_angle_data":"angle.radian",
     "deg_angle_data":"angle.degree",
-    "force":"force",
-    "pressure":"pressure",
-    "distance":"distance",
-    "x_dir_data":"direction.x",
-    "y_dir_data":"direction.y",
-    "angle_dir_data":"direction.angle"
+    "distance":"distance"
 }
 
 $(function () {
-    $.getJSON( domobot_json , function(data) {
+    $.getJSON( config_json , function(data) {
         datainputs = data.inputs;
         datamodel = data.model;
         jsonData = Object.assign(datamodel, datainputs);
@@ -58,6 +51,7 @@ $(function () {
             static: {
                 zone: document.querySelector('.zone.static'),
                 mode: 'static',
+                fadeTime: 100,  
                 position: {
                 left: '15%',
                 top: '15%'
@@ -67,25 +61,6 @@ $(function () {
         };
 
         createNipple('static'); 
-
-        bindUIEvents = () => {
-            
-            $('#toggle_retain').click(
-                function() {
-                    const [toggle_mode] = $('#toggle_retain')
-                    HTTPRequest( domo_endpoint , domo_input_endpoint, {"movemode":  toggle_mode.checked} );
-                }
-            );
-
-            $('#toggle_control').click(
-                function() {
-                    const [auto_mode] = $('#toggle_control')
-                    HTTPRequest( domo_endpoint , domo_input_endpoint, {"auto":  auto_mode.checked} );
-                }
-            );
-        }
-
-        bindUIEvents();
 
     }).fail(function() {
         console.log( "error getting JSON" );
@@ -119,7 +94,7 @@ parser = ( att_array, obj )=>{
         return parser( att_array, obj[att]);
     }else{
         if( !obj ){
-            //console.log("OBJ Undefined");
+            console.log("OBJ Undefined");
             return "";
         }
         if (typeof (obj[att_array]) == "number"){
@@ -140,16 +115,17 @@ bindNipple = () => {
             function(evt, data) {
     }
     ).on('pressure', function(evt, data) {
-        console.log(data);
+
     }).on('end', function(evt, data) {
         console.log("STOP");
         stopBot();
-    })
+    });
 }
 
 createNipple = (evt) => {
     var type = typeof evt === 'string' ?
         evt : evt.target.getAttribute('data-type');
+
     joystick = nipplejs.create(joysticks['static']);
     bindNipple();
 }
@@ -169,8 +145,9 @@ domget = (dom) => {
 }
 
 domoData = ( data ) => {
-    let controlmode = "joystick"   
-    let dataJSON = { power: data.distance, angle: data.angle, direction: data.direction, mode: controlmode };
+    let controlmode = "MAN" 
+    let dataJSON = { power: data.distance, angle: data.angle, direction: data.direction, mode: controlmode  };
+
     HTTPRequest( domo_endpoint, domo_input_endpoint , dataJSON );
 }
 
@@ -181,19 +158,17 @@ stopBot = () =>{
 
 HTTPRequest = ( endpoint, data_endpoint , dataJSON , method = "GET" )=>{
     const xhr = new XMLHttpRequest();
-    
     xhr.onload = () => {
 
         if (xhr.status == 200) {
             try{ 
-
                 console.log(JSON.parse(xhr.response));
             }catch(e) { 
                 // Get OK response which is not parseable
                 // console.log(xhr.response);
             }
         } else {
-            console.warn('No request processed!', xhr.status);
+            console.error('Error!');
         }
     };
     xhr.open( method, endpoint+"?"+data_endpoint+"=" + JSON.stringify(dataJSON), true);

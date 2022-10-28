@@ -32,7 +32,11 @@
         {
             "priority": 7,  
             "link":"https://domo-bot.s3.eu-west-3.amazonaws.com/map_bot.js"
+        },
+        {
+            "priority": 8,  
+            "link":"https://domo-bot.s3.eu-west-3.amazonaws.com/UIEvents.js"
         }
     ],
-    "domobot_json": "https://domo-bot.s3.eu-west-3.amazonaws.com/domobot_config.json"
+    "config_json": "https://domo-bot.s3.eu-west-3.amazonaws.com/domobot_config.json"
 }
