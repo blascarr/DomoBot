@@ -1,5 +1,5 @@
 void initWebServer() {
-  Serial.println("Server On");
+  DUMPSLN("Server On");
   // Handle Web Server
   server.on("/", HTTP_GET, [](AsyncWebServerRequest * request) {
     request->send_P(200, "text/html", domobot_html);
@@ -8,8 +8,7 @@ void initWebServer() {
    server.on( DOMOBOT_ENDPOINT, HTTP_GET, [] (AsyncWebServerRequest *request) {  
     if (request->hasParam( DATA_REQUEST_INPUT )){
       String jsonData = request->getParam(DATA_REQUEST_INPUT)->value();
-      Serial.print(" JSON Data ");
-      Serial.println( jsonData );
+      DUMP(" JSON Data ", jsonData );
       bot.setStatus(jsonData);
       request->send(200, "text/plain", "OK");
     }
@@ -19,10 +18,10 @@ void initWebServer() {
   events.onConnect([](AsyncEventSourceClient * client) {
     if (client->lastId()) {
       //#ifdef SERIALDEBUG
-        Serial.printf("Client reconnected! Last message ID that it got is: %u\n", client->lastId());
+        DUMPF("Client reconnected! Last message ID that it got is: %u\n", client->lastId());
       //#endif
     }
-    Serial.print("On Connect Event ");
+    DUMPSLN("On Connect Event ");
   });
   
   server.addHandler( &events );

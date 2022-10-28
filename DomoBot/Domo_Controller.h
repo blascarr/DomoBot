@@ -34,15 +34,12 @@ class Domo{
     }
       
     void setStatus( String payload ){
-      Serial.print("Set status from JSON: ");
-      Serial.println( payload );
+      DUMPLN("Set status from JSON: ", payload );
       JSONVar domoJSON = JSON.parse(payload);
       if (JSON.typeof(domoJSON) == "undefined") {
-        Serial.println("Parsing input failed!");
+        DUMPSLN("Parsing input failed!");
         return;
       }
-      
-      Serial.println();
 
       if (domoJSON.hasOwnProperty("power")) {
         this->currentStatus.power = (int) domoJSON["power"];
@@ -62,7 +59,7 @@ class Domo{
 
       if (domoJSON.hasOwnProperty("auto")) {
         bool automode = (bool) domoJSON["auto"];
-        this->currentStatus.power = 50;
+        this->currentStatus.power = MAX_POWER;
         
         if( automode ){
           this->currentStatus.controller = RUN;
@@ -125,19 +122,21 @@ class Domo{
         if( mode.indexOf("AUTO") == 0 ){
            setStatusMode( RUN );
            this->currentStatus.autobot = AUTOMATIC;
+           DUMPSLN("AUTOMATIC");
         }
         if( mode.indexOf("MAN") == 0 ){
            setStatusMode( RUN );
            this->currentStatus.autobot = MANUAL;
+           DUMPSLN("MANUAL");
         }
         if( mode.indexOf("OFF") == 0 ){
            setStatusMode( OFF );
            this->currentStatus.autobot = STOP;
-           Serial.println("OFF");
+           DUMPSLN("OFF");
         }
         if( mode.indexOf("UNDE") == 0 ){
            setStatusMode( UNDEF );
-           Serial.println("UNDEF");
+           DUMPSLN("UNDEF");
         }
     }
 
@@ -163,7 +162,7 @@ class Domo{
           switch( data ){
             case 'A':
               this->currentStatus.autobot = AUTOMATIC;
-              this->currentStatus.power = 50;
+              this->currentStatus.power = MAX_POWER;
             break;
             case 'F':
               this->currentStatus.autobot = MANUAL;
@@ -190,7 +189,7 @@ class Domo{
             break;
             case 'P':
               this->currentStatus.power = Serial.parseInt();
-              Serial.print("Serial Power : ");Serial.println( this->currentStatus.power );
+              DUMPLN("Serial Power : ", this->currentStatus.power );
             break;
             default:
         

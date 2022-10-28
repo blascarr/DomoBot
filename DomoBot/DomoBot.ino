@@ -2,7 +2,7 @@
 #include <Arduino_JSON.h>
 
 #include "config.h"
-
+#include "Debug_Controller.h"
 #include "OTA_Controller.h"
 #include "Server_Controller.h"
 
@@ -41,12 +41,5 @@ void setup() {
 }
 
 void loop() {
-  //events.send(getReadings().c_str(), "indoor_info", millis());
-  //  lecturasOPT();
-  //  leerBT();
-  //  xyAdiferencial();
-  //  salidaMotores ();
-  //  esquivaObstaculos ();
-  //  paroMotores ();
 
 }

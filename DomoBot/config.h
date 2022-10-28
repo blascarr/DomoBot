@@ -12,14 +12,15 @@ char DOMOLAMP_ID  [BOT_ID_LEN]   = "D0M0B0T";
 #define LEFT_WHEEL_IN2      16
 
 #define DOMOBOT_DEBUG false
-#define DOMOBOT_POSE true
+#define DOMOBOT_POSE false
+
 // DOMOBOT SPECS [mm]
 
-#define CATERPILLAR_WIDTH   19
-#define DOMOBOT_WIDTH       98
-#define DOMOBOT_LENGTH      86
-#define WHEEL_DIAMETER      39
-#define MOTOR_STEPS         1040  // [Steps/revolution]
+#define CATERPILLAR_WIDTH   19    //  [mm]
+#define DOMOBOT_WIDTH       98    //  [mm]
+#define DOMOBOT_LENGTH      86    //  [mm]
+#define WHEEL_DIAMETER      39    //  [mm]
+#define MOTOR_STEPS         1040  //  [Steps/revolution]
 const int WHEELS_DISTANCE = DOMOBOT_WIDTH - CATERPILLAR_WIDTH;
 
 // Setup PWM ESP32
@@ -29,7 +30,6 @@ const int PWM_Res = 10;
 const int PWM_Freq = 20000;
 
 // Pinout Encoder CONFIG
-// Encoder 1000 steps = 180mm
 #define EncoderPin_A     36  
 #define EncoderPin_B     39
 #define EncoderPin_C     35
@@ -90,11 +90,16 @@ bool IsCW_R = true;
 #define MAP_STREAM "map_data"
 long server_millis;
 long server_latency = 200;
+
 // STREAM CONFIG
 #define STREAM_CHARLENGTH 4
 #define SERIAL_CONTROL true
 long serial_latency = 200;
 long serial_millis;
+#define SERIAL_DEBUG false
+#if SERIAL_DEBUG
+    #define SERIALDEBUG Serial
+#endif
 
 // SLEEP CONFIG
 #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */

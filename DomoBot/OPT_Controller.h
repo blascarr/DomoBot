@@ -51,8 +51,7 @@
       void begin(){
         init();
         if (getLastError()){
-          Serial.print(F("Failed to initialize OPT3101: error "));
-          Serial.println( getLastError() );
+          DUMPLN("Failed to initialize OPT3101: error ", getLastError() );
           disabled = true;
           return;
         }
@@ -78,25 +77,20 @@
             distanceSort();
             #if OPTO_DEBUG
               for (uint8_t i = 0; i < OPTO_SENSORS; i++){
-                Serial.print( "\t\t\t" );
-                Serial.print( i );
+                DUMP( "\t\t\t" , i );
               }
-              Serial.println();
+              DUMPPRINTLN();
               for (uint8_t i = 0; i < OPTO_SENSORS; i++){
-                Serial.print( "\t\t\t" );
-                Serial.print(emitters[i].position);
-                Serial.print( " - " );
-                Serial.print(emitters[i].distance);
+                DUMP( "\t\t\t" , emitters[i].position);
+                DUMP( " - " , emitters[i].distance);
               }
-              Serial.println();
+              DUMPPRINTLN();
               for (uint8_t i = 0; i < OPTO_SENSORS; i++){
-                Serial.print( "\t\t\t" );
-                Serial.print(emittersQueue[i]->position);
-                Serial.print( " - " );
-                Serial.print(emittersQueue[i]->distance);
+                DUMP( "\t\t\t" , emittersQueue[i]->position);
+                DUMP( " - " , emittersQueue[i]->distance);
               }
-              Serial.println();
-              Serial.println();
+              DUMPPRINTLN();
+              DUMPPRINTLN();
             #endif
           }
           nextChannel();
@@ -118,12 +112,12 @@
           bool emitterCheck = emitters[i].distance < OPTO_SECURITY_DISTANCE;
           passage += (uint8_t)( emitterCheck )*pow(2,emitters[i].position);
           #if PASSAGE_DEBUG
-            Serial.print( emitterCheck );
-            Serial.print(" \t\t ");
+            DUMPV( emitterCheck );
+            DUMPS(" \t\t ");
           #endif
         }
         #if PASSAGE_DEBUG
-          Serial.println(passage);
+          DUMPVLN(passage);
         #endif
         return passage;
       }

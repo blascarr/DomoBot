@@ -221,16 +221,11 @@ class DomoBot : public Domo {
         
         sendServerPose();
         #if DOMOBOT_POSE
-          Serial.print("Right Wheel: ");
-          Serial.print( wheelR_position);
-          Serial.print(" - Left Wheel: ");
-          Serial.print(wheelL_position);
-          Serial.print(" -> Current Position: X - ");
-          Serial.print( x );
-          Serial.print("\t Y - ");
-          Serial.print( y );
-          Serial.print("\t O - ");
-          Serial.println( theta_deg );
+          DUMP("Right Wheel: ", wheelR_position);
+          DUMP(" - Left Wheel: ", wheelL_position);
+          DUMP(" -> Current Position: X - ", x );
+          DUMP("\t Y - ", y );
+          DUMPLN("\t O - ", theta_deg );
         #endif
       }
     }
@@ -261,10 +256,8 @@ class DomoBot : public Domo {
           last_leftPos = leftPos;
           
           #if ENCODER_DEBUG
-            Serial.print("Right Encoder: ");
-            Serial.print(rightPos);
-            Serial.print(" - Left Encoder: ");
-            Serial.println(leftPos);
+            DUMP("Right Encoder: ", rightPos);
+            DUMPLN(" - Left Encoder: ", leftPos);
           #endif
         }
     }

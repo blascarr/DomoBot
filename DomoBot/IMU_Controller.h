@@ -52,7 +52,7 @@
               Fastwire::setup(400, true);
           #endif
           
-          Serial.println(F("Initializing I2C devices..."));
+          DUMPSLN("Initializing I2C devices...");
           this->initialize();
           
           #if IMU_INTERRUPT_MODE
@@ -60,17 +60,17 @@
           #endif
           
           // Verify connection
-          Serial.println(F("Testing device connections..."));
-          Serial.println(this->testConnection() ? F("MPU6050 connection successful") : F("MPU6050 connection failed"));
+          DUMPSLN("Testing device connections...");
+          DUMPSLN(this->testConnection() ? "MPU6050 connection successful" : "MPU6050 connection failed");
       
           // wait for ready
-          Serial.println(F("\nSend any character to begin DMP programming and demo: "));
+          DUMPSLN("\nSend any character to begin DMP programming and demo: ");
           while (Serial.available() && Serial.read()); // empty buffer
           while (!Serial.available());                 // wait for data
           while (Serial.available() && Serial.read()); // empty buffer again
       
           // load and configure the DMP
-          Serial.println(F("Initializing DMP..."));
+          DUMPSLN("Initializing DMP...");
           devStatus = this->dmpInitialize();
       
           // supply your own gyro offsets here, scaled for min sensitivity
@@ -86,19 +86,18 @@
               this->CalibrateGyro(6);
               this->PrintActiveOffsets();
               // turn on the DMP, now that it's ready
-              Serial.println(F("Enabling DMP..."));
+              DUMPSLN("Enabling DMP...");
               this->setDMPEnabled(true);
 
               #if IMU_INTERRUPT_MODE
                 // enable Arduino interrupt detection
-                Serial.print(F("Enabling interrupt detection (Arduino external interrupt "));
-                Serial.print(digitalPinToInterrupt(MPU_INTERRUPT_PIN));
-                Serial.println(F(")..."));
+                DUMPLN("Enabling interrupt detection (Arduino external interrupt ",digitalPinToInterrupt(MPU_INTERRUPT_PIN));
+    
                 
                 mpuIntStatus = this->getIntStatus();
         
                 // set our DMP Ready flag so the main loop() function knows it's okay to use it
-                Serial.println(F("DMP ready! Waiting for first interrupt..."));
+                DUMPSLN("DMP ready! Waiting for first interrupt...");
               #endif
               dmpReady = true;
       
@@ -109,17 +108,16 @@
               // 1 = initial memory load failed
               // 2 = DMP configuration updates failed
               // (if it's going to break, usually the code will be 1)
-              Serial.print(F("DMP Initialization failed (code "));
-              Serial.print(devStatus);
+              DUMPLN("DMP Initialization failed (code ", devStatus);
               switch (devStatus){
                 case 1:
-                  Serial.println(F(") - Initial memory load failed"));
+                  DUMPSLN(") - Initial memory load failed");
                 break;
                 case 2:
-                  Serial.println(F(") - DMP configuration updates failed"));
+                  DUMPSLN(") - DMP configuration updates failed");
                 break;
                 default:
-                  Serial.println(F(") - Unknown"));
+                  DUMPSLN(") - Unknown");
                 break;
               }
           }
@@ -140,14 +138,10 @@
       }
 
       void IMU_Debug(){
-            Serial.print("Qx : ");
-            Serial.print( q.x );
-            Serial.print(" Qy : ");
-            Serial.print( q.y );
-            Serial.print(" Qz : ");
-            Serial.print( q.z );
-            Serial.print(" Qw : ");
-            Serial.println( q.w );
+            DUMP("Qx : ",q.x );
+            DUMP("\t Qy : ", q.y );
+            DUMP("\t Qz : ", q.z );
+            DUMPLN("\t Qw : ", q.w );
       }
   };
 

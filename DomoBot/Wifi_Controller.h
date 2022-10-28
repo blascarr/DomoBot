@@ -22,41 +22,41 @@ ESPAsync_WiFiManager wifiManager(&server, &dns);
 Ticker wifiReconnectTimer;
 
 void connectToWifi() {
-  Serial.println("Wi-Fi ...");
+  DUMPSLN("Wi-Fi ...");
   WiFi.mode(WIFI_STA);
   #if WIFIMANAGER
-    Serial.println("Connecting to WifiManager...");
+    DUMPSLN("Connecting to WifiManager...");
     wifiManager.addParameter(&custom_sleep);
   
     bool wifiManagerConnected = wifiManager.autoConnect(WIFI_HOST);
   
     if ( wifiManagerConnected ) {
-      Serial.println("Async WifiManager On");
-      Serial.print("Connected to Wifi - Local IP : ");
+      DUMPSLN("Async WifiManager On");
+      
       // Configures static IP address
       if (!WiFi.config(LOCAL_IP, GATEWAY, SUBNET, PRIMARYDNS, SECONDARYDNS)) {
-        Serial.println("STA Failed to configure");
+        DUMPSLN("STA Failed to configure");
       }
     }
     else {
-      Serial.println("Configportal running");
+      DUMPSLN("Configportal running");
     }
     while (WiFi.waitForConnectResult() != WL_CONNECTED) {
-      Serial.println("Connection Failed! Rebooting...");
+      DUMPSLN("Connection Failed! Rebooting...");
       delay(5000);
       ESP.restart();
     }
   #else
     WiFi.begin( WIFI_SSID, WIFI_PASS );
     if (!WiFi.config(LOCAL_IP, GATEWAY, SUBNET, PRIMARYDNS, SECONDARYDNS)) {
-      Serial.println("STA Failed to configure");
+      DUMPSLN("STA Failed to configure");
     }
-    Serial.println("Connecting to Wifi...");
+    DUMPS("Connecting to Wifi...");
     while (WiFi.status() != WL_CONNECTED) {
-      Serial.print('.');
+      DUMPS('.');
       delay(1000);
     }
   #endif
-
-  Serial.println(WiFi.localIP());
+  DUMPPRINTLN();
+  DUMPLN("Connected to Wifi - Local IP : ", WiFi.localIP());
 }
