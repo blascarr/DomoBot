@@ -91,6 +91,9 @@ bool IsCW_R = true;
 
 // STREAM CONFIG
 #define STREAM_CHARLENGTH 4
+#define SERIAL_CONTROL true
+long serial_latency = 200;
+long serial_millis;
 
 // SLEEP CONFIG
 #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */

@@ -94,7 +94,6 @@ $(function () {
 
 // Dump data
 dump = (obj) => {
-    // console.log( obj );
     for (var el in keys) {
         const attparser =  keys[el].split(".");
         if( attparser.length > 1 ){
@@ -176,7 +175,7 @@ domoData = ( data ) => {
 }
 
 stopBot = () =>{
-    const dataJSON = { event: "STOP" };
+    const dataJSON = { mode: "OFF" };
     HTTPRequest( domo_endpoint, domo_input_endpoint , dataJSON );
 }
 

@@ -35,6 +35,9 @@ void setup() {
   bot.init();
   botTicker.attach_ms( time_interval, botloop );
   
+  #if SERIAL_CONTROL
+    serialTicker.attach_ms( time_interval, serial_loop );
+  #endif
 }
 
 void loop() {

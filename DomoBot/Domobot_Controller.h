@@ -1,6 +1,10 @@
 #include "Domo_Controller.h"
 Ticker botTicker;
 
+#if SERIAL_CONTROL
+  Ticker serialTicker;
+#endif
+  
 #include "EncoderStepCounter.h"
 #include "Wheel_Controller.h"
 
@@ -91,13 +95,13 @@ class DomoBot : public Domo {
         calculate_position();
       }
     };
-
+    
     void setDomo(){
-      switch (this->currentStatus.controller) {
-        case AUTO:
+      switch (this->currentStatus.autobot) {
+        case AUTOMATIC:
             controller = &DomoBot::autonomous;
         break;
-        case JOYSTICK:
+        case MANUAL:
             if( this->currentStatus.movemode == DISCRETE ){
                 motors.powerWheels( this->currentStatus.power , this->currentStatus.power );
                 /*
@@ -124,19 +128,15 @@ class DomoBot : public Domo {
               motors.setWheelsPower( power_left , power_right , true );
               controller = &DomoBot::continuousMovement;
             }
+            if( this->currentStatus.movemode == TEST ){
+              motors.powerWheels( this->currentStatus.power , this->currentStatus.power );
+              motors.setStatus( this->currentStatus.wheels );
+              controller = &DomoBot::testMovement;
+            }
             break;
-        case TEST:
-          Serial.println( "Test Mode");
-          motors.powerWheels(50 , 50);
-          motors.setStatus(LTURNBACK);
-          controller = &DomoBot::testMovement;
-        break;
         case STOP:
             controller = &DomoBot::stop;
             break;
-        case OFF:
-            controller = &DomoBot::stop;
-        break;
         default:
         
         break;
@@ -175,8 +175,7 @@ class DomoBot : public Domo {
          if ( currentPassage < 0 ) return;
          wheelStatus passageStatusList[] = { FORWARD, RIGHT, UNKNOWN, RIGHT, LEFT, FORWARD, LEFT, POWEROFF };
          wheelStatus nextStatus = passageStatusList[ currentPassage ];
-         Serial.print( "Passage : " );Serial.print( currentPassage );Serial.print( " Status : " );
-         Serial.println( nextStatus );
+         
          if ( nextStatus == UNKNOWN ){  // FRONTWALL CASE - Decision taken to move RIGHT OR LEFT
               if( OPT->emittersQueue[1]->position == OPTO_LEFT ){
                 nextStatus = LEFT;

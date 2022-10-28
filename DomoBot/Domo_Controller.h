@@ -1,6 +1,7 @@
-enum modes { UNDEF, JOYSTICK, AUTO, STOP, OFF, TEST  };
-enum movement { DISCRETE, CONTINUOUS, RELATIVE, ABSOLUTE};
-enum autonomy { MANUAL, AUTOMATIC };
+enum modes { UNDEF, RUN, OFF };
+enum movement { DISCRETE, CONTINUOUS, TEST };
+enum reference { RELATIVE, ABSOLUTE};
+enum autonomy { MANUAL, AUTOMATIC, STOP };
 enum wheelStatus { FORWARD = 1, BACKWARD = -1, LTURN = 4, RTURN = 5, LEFT = 2, RIGHT = 3, LTURNBACK = 6, RTURNBACK = 7, POWEROFF = 0, UNKNOWN = -2 };
 
 struct statusBot{
@@ -8,9 +9,10 @@ struct statusBot{
   float theta = 0;
   uint8_t dir = 0;
   autonomy autobot = AUTOMATIC;
-  modes controller = AUTO;
+  modes controller = RUN;
   movement movemode = CONTINUOUS;
   wheelStatus wheels = POWEROFF;
+  reference ref = ABSOLUTE;
   String mode;
   uint16_t latency;
 };
@@ -21,6 +23,7 @@ class Domo{
     AsyncEventSource *eventSource;
     
     long run_millis;
+    
     Domo(){
       
     }
@@ -39,8 +42,6 @@ class Domo{
         return;
       }
       
-      Serial.print("JSON.typeof(myObject) = ");
-      Serial.println(JSON.typeof(domoJSON)); // prints: object
       Serial.println();
 
       if (domoJSON.hasOwnProperty("power")) {
@@ -61,18 +62,19 @@ class Domo{
 
       if (domoJSON.hasOwnProperty("auto")) {
         bool automode = (bool) domoJSON["auto"];
+        this->currentStatus.power = 50;
+        
         if( automode ){
+          this->currentStatus.controller = RUN;
           this->currentStatus.autobot = AUTOMATIC;
-          this->currentStatus.controller = AUTO;
         }else{
-          this->currentStatus.autobot = MANUAL;
-          this->currentStatus.controller = JOYSTICK;
+          this->currentStatus.controller = OFF;
+          this->currentStatus.autobot = STOP;
         }
       }
 
       if (domoJSON.hasOwnProperty("movemode")) {
         bool movemode = (bool) domoJSON["movemode"];
-        this->currentStatus.controller = JOYSTICK;
         if( movemode ){
           this->currentStatus.movemode = CONTINUOUS;
         }else{
@@ -117,15 +119,20 @@ class Domo{
     }
     
     void setDomoStatus( String mode ){
-        if( mode.indexOf("joys") == 0 ){
-           setStatusMode( JOYSTICK );
+        if( mode.indexOf("RUN") == 0 ){
+           setStatusMode( RUN );
         }
-        if( mode.indexOf("STOP") == 0 ){
-           setStatusMode( STOP );
-           Serial.println("STOP");
+        if( mode.indexOf("AUTO") == 0 ){
+           setStatusMode( RUN );
+           this->currentStatus.autobot = AUTOMATIC;
+        }
+        if( mode.indexOf("MAN") == 0 ){
+           setStatusMode( RUN );
+           this->currentStatus.autobot = MANUAL;
         }
         if( mode.indexOf("OFF") == 0 ){
            setStatusMode( OFF );
+           this->currentStatus.autobot = STOP;
            Serial.println("OFF");
         }
         if( mode.indexOf("UNDE") == 0 ){
@@ -142,4 +149,55 @@ class Domo{
       return false;
     }
     
+    #if SERIAL_CONTROL
+      void serial_loop(){
+        if( millis() - serial_millis >= serial_latency ){
+          serial_millis = millis();
+          serialController();
+        }
+      }
+      
+      void serialController(){
+        if( Serial.available() ){
+          char data = Serial.read();
+          switch( data ){
+            case 'A':
+              this->currentStatus.autobot = AUTOMATIC;
+              this->currentStatus.power = 50;
+            break;
+            case 'F':
+              this->currentStatus.autobot = MANUAL;
+              this->currentStatus.movemode = TEST;
+              this->currentStatus.wheels = FORWARD;
+            break;
+            case 'B':
+              this->currentStatus.autobot = MANUAL;
+              this->currentStatus.movemode = TEST;
+              this->currentStatus.wheels = BACKWARD;
+            break;
+            case 'L':
+              this->currentStatus.autobot = MANUAL;
+              this->currentStatus.movemode = TEST;
+              this->currentStatus.wheels = LEFT;
+            break;
+            case 'R':
+              this->currentStatus.autobot = MANUAL;
+              this->currentStatus.movemode = TEST;
+              this->currentStatus.wheels = RIGHT;
+            break;
+            case 'S':
+              this->currentStatus.autobot = STOP;
+            break;
+            case 'P':
+              this->currentStatus.power = Serial.parseInt();
+              Serial.print("Serial Power : ");Serial.println( this->currentStatus.power );
+            break;
+            default:
+        
+            break;
+          }
+        }
+        setDomo();
+      }
+    #endif
 };
