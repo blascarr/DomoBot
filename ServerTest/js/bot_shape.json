@@ -1,0 +1,19 @@
+{
+    "name": "bot shape",
+    "geometry": "ShapeGeometry",
+    "model": "points",
+    "shape": [
+        [ 0, 60 ],
+        [ -40, -40],
+        [ -40, 40],
+        [ 0, 60]
+    ],
+    "color": "0x00ff00",
+    "material": "",
+    "extrudeSettings": {
+        "bevelEnabled" : true,
+        "bevelSegments" : 2,
+        "steps" : 2,
+        "extrudePath" : []
+    }
+}

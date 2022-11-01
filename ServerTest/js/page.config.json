@@ -1,0 +1,97 @@
+{
+    "model":{
+        "joystick_id":"zone_joystick",
+        "joystick_class":"zone static",
+        "joystick_label":"Joystick",
+
+        "dump_id":"dump",
+        "dump_class":"dump",
+        "position_class":"position",
+        "class_inline" : "inline",
+
+        "angle_class":"angle",
+        "angle_label":"Angle",
+
+        "rad_angle_id":"rad_angle_data",
+        "rad_angle_data":"rad_angle_data",
+        "rad_angle_class":"radian data",
+        "rad_angle_label":"Radian : ",
+
+        "deg_angle_id":"deg_angle_data",
+        "deg_angle_data":"deg_angle_data",
+        "deg_angle_class":"degree data",
+        "deg_angle_label":"Degree : ",
+
+        "distance_id":"distance",
+        "distance_class":"distance",
+        "distance_label":"Distance : ",
+
+        "toggle_class":"slider round",
+        "toggle_control_id": "toggle_control",
+        "toggle_retain_id": "toggle_retain",
+
+        "x_pos_id":"x_pos_data",
+        "x_pos_class":"x data",
+        "x_pos_class_value":"x_pos_data",
+        "x_pos_label":"X : ",
+
+        "y_pos_id":"y_pos_data",
+        "y_pos_class":"y data",
+        "y_pos_class_value":"y_pos_data",
+        "y_pos_label":"Y : ",
+
+        "theta_pos_id":"theta_pos_data",
+        "theta_pos_class":"theta_data",
+        "theta_pos_class_value":"theta_pos_data",
+        "theta_pos_label":"Angle : "
+
+    },
+    "template":{"<>":"div","class":"container","html":[
+        {"<>":"div","id":"${joystick_id}","class":"${joystick_class}","html":[
+            {"<>":"h1","html":"${joystick_label}"}
+        ]},
+        {"<>":"div","id":"${dump_id}","class":"${dump_class}","html":[
+            
+            {"<>":"div","class":"${angle_class}","html":[
+                {"<>":"h4","html":"Angle"},
+                {"<>":"div","class":"${rad_angle_class}","html":[
+                    {"<>":"div", "class":"${class_inline}","html":"${rad_angle_label}"},
+                    {"<>":"div", "id":"${rad_angle_id}", "class":"${class_inline}","html":"${rad_angle_value}"}
+                ]},
+                {"<>":"div","class":"${deg_angle_class}","html":[
+                    {"<>":"div", "class":"${class_inline}","html":"${deg_angle_label}"},
+                    {"<>":"div", "id":"${deg_angle_id}", "class":"${class_inline}","html":"${deg_angle_value}"}
+                ]}
+            ]},
+            
+            {"<>":"br","html":""},
+            {"<>":"div", "class":"${distance_class}","html":[
+                {"<>":"div", "class":"${class_inline}","html":"${distance_label}"},
+                {"<>":"div", "id":"${distance_id}", "class":"${class_inline}","html":"${distance_value}"}
+            ]},
+            {"<>":"label","class":"switch","html":[
+                {"<>":"input", "id":"${toggle_retain_id}", "type":"checkbox","checked":"","html":""},
+                {"<>":"span","class":"${toggle_class}","html":""}
+            ]},
+            {"<>":"label","class":"switch","html":[
+                {"<>":"input", "id":"${toggle_control_id}", "type":"checkbox","checked":"","html":""},
+                {"<>":"span","class":"${toggle_class}","html":""}
+            ]},
+            {"<>":"div","class":"${position_class}","html":[
+                {"<>":"h4","html":"Position"},
+                {"<>":"div", "class":"${x_pos_class}","html":[
+                    {"<>":"div", "class":"${class_inline}","html":"${x_pos_label}"},
+                    {"<>":"div","id":"${x_pos_id}", "class":"${class_inline}","html":"${x_pos_value}"}
+                ]},
+                {"<>":"div","class":"${y_pos_class}","html":[
+                    {"<>":"div", "class":"${class_inline}","html":"${y_pos_label}"},
+                    {"<>":"div","id":"${y_pos_id}", "class":"${class_inline}","html":"${y_pos_value}"}
+                ]},
+                {"<>":"div","class":"${theta_pos_class}","html":[
+                    {"<>":"div", "class":"${class_inline}","html":"${theta_pos_label}"},
+                    {"<>":"div","id":"${theta_pos_id}", "class":"${class_inline}","html":"${theta_pos_value}"}
+                ]}
+            ]}
+        ]}
+    ]}
+}
