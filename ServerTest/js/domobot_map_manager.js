@@ -11,7 +11,7 @@
 const remote_rsc = "js/src.config.json";
 
 // const remote_rsc = "https://domo-bot.s3.eu-west-3.amazonaws.com/remote.config.json";
-const queue_rsc = "https://utilsjs.s3.eu-west-3.amazonaws.com/Queue_manager.js";
+const queue_rsc = "js/Queue_manager.js";
 let config_json ;
 const loadTime = 7000;
 let scriptHeadQueue;
