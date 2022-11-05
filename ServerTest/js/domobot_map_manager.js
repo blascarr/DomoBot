@@ -6,13 +6,12 @@
     DOMOBOT MAP MANAGER
 */
 
-// const remote_rsc = "https://domo-bot.s3.eu-west-3.amazonaws.com/remote.config.json";
-// const remote_rsc = "js/remote.config.json";
 const remote_rsc = "js/src.config.json";
 
-// const remote_rsc = "https://domo-bot.s3.eu-west-3.amazonaws.com/remote.config.json";
 const queue_rsc = "js/Queue_manager.js";
 let config_json ;
+let config_shape ;
+let bot_shape ;
 const loadTime = 7000;
 let scriptHeadQueue;
 let cssHeadQueue;

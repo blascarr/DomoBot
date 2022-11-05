@@ -44,7 +44,6 @@ init = async()=>{
     setTimeout(async function(){
         console.log("Stop Timeout");
         await window.clearInterval(headerScriptsTimer);
-        // console.log("Loader Manager is working");
     }, loadTime );
 
 }
@@ -111,6 +110,6 @@ appendCSS = ( srcFileName ) =>{
     return linkToLoad;
 }
 
-scriptHeadQueue = new Queue( 300 );
+scriptHeadQueue = new Queue( 100 );
 cssHeadQueue = new Queue( 100 );
 init();

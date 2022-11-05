@@ -19,13 +19,19 @@ const objectScaleV = gridSizeV;
 let container;
 let camera, controls, scene, projector, renderer,helper;
 let plane;
-let geometry = new THREE.ConeGeometry( 1, 5, 15 );
+let geometry = new THREE.ConeGeometry( 0.5, 2, 15 );
 geometry.rotateZ( -Math.PI/2);
-var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0x0ab86b } ) );
+let object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0x0ab86b } ) );
+
+let bot_origin_geometry = new THREE.BoxGeometry( 1, 1, 1 );
+let target_geometry = new THREE.BoxGeometry( 1, 1, 1 );
+const target =  new THREE.Mesh( target_geometry, new THREE.MeshLambertMaterial( { color: 0x0ab86b } ) );
+const bot_origin =  new THREE.Mesh( bot_origin_geometry, new THREE.MeshLambertMaterial( { color: 0xaaff22 } ) ); 
+
 const axesHelper = new THREE.AxesHelper( helperLength );
 const originAxisHelper = new THREE.AxesHelper( helperLength );
 
-let transformControl;
+let target_transformControl, origin_transformControl;
 
 function init() {
 
@@ -40,11 +46,14 @@ function init() {
     scene.background = new THREE.Color( 0xf0f0f0 );
     setLight();
     setBot();
+    setTarget();
+    setBotOrigin();
     setGround();
     setWorldAxis();
     scene.add( originAxisHelper );
 
-    attachtransform();
+    target_transform();
+    origin_transform();
     //setGridHelper();
     objectControl();
     window.addEventListener( 'resize', onWindowResize, false );
@@ -66,6 +75,40 @@ function setBot(){
     object.receiveShadow = true;
 
     scene.add( object );
+}
+
+function setTarget(){
+    target.material.ambient = target.material.color;
+
+    target.position.x = 400;
+    target.position.y = 500;
+    target.position.z = 0;
+
+    target.scale.x = objectScaleH;
+    target.scale.y = objectScaleV;
+    target.scale.z = objectScaleH;
+
+    target.castShadow = true;
+    target.receiveShadow = true;
+
+    scene.add( target );
+}
+
+function setBotOrigin(){
+    bot_origin.material.ambient = bot_origin.material.color;
+
+    bot_origin.position.x = 0;
+    bot_origin.position.y = 0;
+    bot_origin.position.z = 0;
+
+    bot_origin.scale.x = objectScaleH;
+    bot_origin.scale.y = objectScaleV;
+    bot_origin.scale.z = objectScaleH;
+
+    bot_origin.castShadow = true;
+    bot_origin.receiveShadow = true;
+    bot_origin.visible = false;
+    scene.add( bot_origin );
 }
 
 function controlsConfig(){
@@ -120,7 +163,7 @@ function setLight(){
     scene.add( new THREE.AmbientLight( 0x505050 ) );
 
     const light = new THREE.SpotLight( 0xffffff, 1.5 );
-    light.position.set( 0, 500, 1000 );
+    light.position.set( 0, 500, 3000 );
     light.castShadow = false;
 
     light.shadow.camera.near = 200;
@@ -145,21 +188,30 @@ function objectControl(){
     const transformControl = new THREE.TransformControls( camera, renderer.domElement );
 }
 
-function attachtransform(){
-    transformControl = new THREE.TransformControls( camera, renderer.domElement );
-    transformControl.addEventListener( 'change', render );
-    transformControl.addEventListener( 'dragging-changed', function ( event ) {
-
+function target_transform(){
+    target_transformControl = new THREE.TransformControls( camera, renderer.domElement );
+    /*target_transformControl.addEventListener( 'change', render );
+    target_transformControl.addEventListener( 'dragging-changed', function ( event ) {
         controls.enabled = ! event.value;
-
     } );
-    scene.add( transformControl );
+    target_transformControl.addEventListener( 'objectChange', function () {    } );
+    */
+    scene.add( target_transformControl );
 
-    transformControl.addEventListener( 'objectChange', function () {
+    target_transformControl.showZ = false;
+    target_transformControl.attach( target );
+}
 
+function origin_transform(){
+    origin_transformControl = new THREE.TransformControls( camera, renderer.domElement );
+    //origin_transformControl.addEventListener( 'change', render );
+    //origin_transformControl.addEventListener( 'dragging-changed', function ( event ) {controls.enabled = ! event.value;} );
+    //origin_transformControl.addEventListener( 'objectChange', function () {} );
+    scene.add( origin_transformControl );
 
-    } );
-    transformControl.attach( object );
+    origin_transformControl.showZ = false;
+    origin_transformControl.attach( bot_origin );
+    origin_transformControl.visible = false;
 }
 
 function onWindowResize() {
@@ -186,3 +238,30 @@ function render() {
     renderer.render( scene, camera );
 
 }
+
+/*if (!!window.EventSource) {
+    var source = new EventSource('/map_events');
+    source.addEventListener('open', function (e) {console.log(
+        "Events Connected");
+    }, false);
+
+    source.addEventListener('error', function (e) {
+        if (e.target.readyState != EventSource.OPEN) {
+            console.log("Events Disconnected");
+        }
+    }, false);
+
+    //Bot Position
+    source.addEventListener('map_data', function (e) {
+        let obj = JSON.parse(e.data);
+        console.log(obj);
+        
+        object.position.x = obj.x;
+        object.position.y = obj.y;
+        object.rotation.z = obj.theta;
+        domget("x_pos_data").innerHTML = obj.x;
+        domget("y_pos_data").innerHTML = obj.y;
+        domget("theta_pos_data").innerHTML = (obj.theta*180/Math.PI)%360;
+    }, false)
+
+};*/

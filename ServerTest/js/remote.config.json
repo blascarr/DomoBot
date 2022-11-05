@@ -19,24 +19,65 @@
         },
         {
             "priority": 4,
-            "link":"https://utilsjs.s3.eu-west-3.amazonaws.com/three.min.js"
+            "link":"https://cdnjs.cloudflare.com/ajax/libs/three.js/0.146.0/three.min.js"
         },
         {
             "priority": 5,
-            "link":"https://utilsjs.s3.eu-west-3.amazonaws.com/TrackballControls.js"
+            "link":"https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"
         },
         {
             "priority": 6,
-            "link":"https://domo-bot.s3.eu-west-3.amazonaws.com/domobot_loader.js"
+            "link":"https://utilsjs.s3.eu-west-3.amazonaws.com/OBJLoader.js"
         },
         {
-            "priority": 7,  
+            "priority": 7,
+            "link":"https://utilsjs.s3.eu-west-3.amazonaws.com/MTLLoader.js"
+        },
+        {
+            "priority": 8,
+            "link":"https://utilsjs.s3.eu-west-3.amazonaws.com/OBJMTLLoader.js"
+        },
+        {
+            "priority": 9,
+            "link":"https://utilsjs.s3.eu-west-3.amazonaws.com/STLLoader.js"
+        },
+        {
+            "priority": 10,
+            "link":"https://cdn.jsdelivr.net/npm/lil-gui@0.17"
+        },
+        {
+            "priority": 11,
+            "link":"https://utilsjs.s3.eu-west-3.amazonaws.com/TrackBallControls.js"
+        },
+        {
+            "priority": 12,
+            "link":"https://utilsjs.s3.eu-west-3.amazonaws.com/TransformControls.js"
+        },
+        {
+            "priority": 13,
+            "link":"https://domo-bot.s3.eu-west-3.amazonaws.com/shape_Loader.js"
+        },
+        {
+            "priority": 14,  
             "link":"https://domo-bot.s3.eu-west-3.amazonaws.com/map_bot.js"
         },
         {
-            "priority": 8,  
+            "priority": 15,
+            "link":"https://domo-bot.s3.eu-west-3.amazonaws.com/domobot_loader.js"
+        },
+        {
+            "priority": 16,  
+            "link":"https://domo-bot.s3.eu-west-3.amazonaws.com/map_init.js"
+        },
+        {
+            "priority": 17,  
+            "link":"https://domo-bot.s3.eu-west-3.amazonaws.com/bot_GUI.js"
+        },
+        {
+            "priority": 18,  
             "link":"https://domo-bot.s3.eu-west-3.amazonaws.com/UIEvents.js"
         }
     ],
-    "config_json": "https://domo-bot.s3.eu-west-3.amazonaws.com/domobot_config.json"
+    "config_json": "https://domo-bot.s3.eu-west-3.amazonaws.com/domobot_config.json",
+    "config_shape": "https://domo-bot.s3.eu-west-3.amazonaws.com/bot_shape.json"
 }

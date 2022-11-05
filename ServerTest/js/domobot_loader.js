@@ -15,6 +15,12 @@ const keys = {
 }
 
 $(function () {
+    $.getJSON( config_shape , function(data) {
+        bot_shape = data;
+    } ).done(function() {
+
+    });
+
     $.getJSON( config_json , function(data) {
         datainputs = data.inputs;
         datamodel = data.model;
@@ -147,13 +153,23 @@ domget = (dom) => {
 domoData = ( data ) => {
     let controlmode = "MAN" 
     let dataJSON = { power: data.distance, angle: data.angle, direction: data.direction, mode: controlmode  };
+    
+    const pX = data.distance*Math.cos(data.angle.radian);
+    const pY = data.distance*Math.sin(data.angle.radian);
+    const worldPosition = new THREE.Vector3( pX , pY , 0 );
 
-    HTTPRequest( domo_endpoint, domo_input_endpoint , dataJSON );
+    object.position.x += pX ;
+    object.position.y += pY ;
+    object.rotation.z = data.angle.radian;
+    domget("x_pos_data").innerHTML = object.position.x.toFixed(2);
+    domget("y_pos_data").innerHTML = object.position.y.toFixed(2);
+    domget("theta_pos_data").innerHTML = (data.angle.degree.toFixed(2));
 }
 
 stopBot = () =>{
     const dataJSON = { mode: "OFF" };
-    HTTPRequest( domo_endpoint, domo_input_endpoint , dataJSON );
+    
+    //HTTPRequest( domo_endpoint, domo_input_endpoint , dataJSON );
 }
 
 HTTPRequest = ( endpoint, data_endpoint , dataJSON , method = "GET" )=>{
