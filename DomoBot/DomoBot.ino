@@ -31,15 +31,31 @@ void setup() {
   #if OPTO
     bot.setOpto( lidar );
   #endif
-  
+
+  #if IMU_ENABLE
+    IMU.setGyroOffsets( 220, 76, -85 );
+    IMU.calibrateAcc(6);
+    IMU.calibrateGyro(6);
+    IMU.setAccelOffsets(0,0, 1788); // 1688 factory default for my test chip
+    IMU.init();
+    bot.setIMU( IMU );
+  #endif
+    
   bot.init();
   botTicker.attach_ms( time_interval, botloop );
   
   #if SERIAL_CONTROL
     serialTicker.attach_ms( time_interval, serial_loop );
   #endif
+  
+  #if IMU_ENABLE
+    IMUTicker.attach_ms( IMU_time_interval, imu_loop );
+  #endif
 }
 
 void loop() {
-
+  #if IMU_ENABLE
+    IMU.update();
+    //IMU_Debug();
+  #endif
 }

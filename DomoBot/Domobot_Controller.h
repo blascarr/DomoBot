@@ -1,6 +1,10 @@
 #include "Domo_Controller.h"
 Ticker botTicker;
 
+#if IMU_ENABLE
+  Ticker IMUTicker;
+#endif
+
 #if SERIAL_CONTROL
   Ticker serialTicker;
 #endif
@@ -41,7 +45,7 @@ class DomoBot : public Domo {
     int opto_distance = 300;
     
     #if IMU_ENABLE 
-      IMU mpu;
+      Domo_IMU *mpu;
     #endif
     
     #if OPTO
@@ -66,7 +70,7 @@ class DomoBot : public Domo {
       attachInterrupt(EncoderPin_D, LeftInterrupt , CHANGE);
       
       #if IMU_ENABLE 
-        mpu.initIMU();
+        mpu->init();
       #endif
 
       #if OPTO
@@ -78,14 +82,20 @@ class DomoBot : public Domo {
     void loop(){
       (this->*controller)();
       
-      #if IMU_ENABLE 
-        mpu.updateIMU();
-      #endif
+      /*#if IMU_ENABLE 
+        mpu->update();
+      #endif*/
     }
     
     #if OPTO
         void setOpto( LIDAR &opto ){
             OPT = &opto;
+        }
+    #endif
+
+    #if IMU_ENABLE
+        void setIMU( Domo_IMU &imu ){
+            mpu = &imu;
         }
     #endif
     
@@ -261,4 +271,10 @@ class DomoBot : public Domo {
           #endif
         }
     }
+
+    #if IMU_ENABLE
+      void imu_loop(){
+        IMU_Debug();
+      }
+    #endif
 };

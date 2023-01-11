@@ -1,3 +1,6 @@
 [submodule "DomoBot/RoboDuino"]
 	path = DomoBot/RoboDuino
 	url = https://github.com/blascarr/RoboDuino
+[submodule "Domo_IMU"]
+	path = Domo_IMU
+	url = https://github.com/blascarr/Domo_IMU
