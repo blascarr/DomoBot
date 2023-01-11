@@ -38,8 +38,14 @@ void setup() {
   #if SERIAL_CONTROL
     serialTicker.attach_ms( time_interval, serial_loop );
   #endif
+  
+  #if IMU_ENABLE
+    bot.setIMU( IMU );
+    IMUTicker.attach_ms( IMU_time_interval, imu_loop );
+  #endif
+  
 }
 
 void loop() {
-
+  updateIMU();
 }

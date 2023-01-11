@@ -37,14 +37,14 @@ const int PWM_Freq = 20000;
 #define ENCODER_DEBUG false
 
 // Pinout IMU MPU CONFIG
-#define IMU_ENABLE false
-#define IMU_INTERRUPT_MODE false
+#define IMU_ENABLE true
+#define IMU_INTERRUPT_MODE true
 #define MPU_INTERRUPT_PIN   4
 long IMU_time_interval = 20;
-#define IMU_DEBUG false
+#define IMU_DEBUG true
 
 // Pinout OPT
-#define OPTO true
+#define OPTO false
 #define OPTO_SENSORS 3
 int OPTO_SECURITY_DISTANCE = 120;
 
@@ -96,7 +96,7 @@ long server_latency = 200;
 #define SERIAL_CONTROL true
 long serial_latency = 200;
 long serial_millis;
-#define SERIAL_DEBUG false
+#define SERIAL_DEBUG true
 #if SERIAL_DEBUG
     #define SERIALDEBUG Serial
 #endif

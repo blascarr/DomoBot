@@ -9,3 +9,10 @@ void botloop(){
     bot.serial_loop();
   }
 #endif
+
+
+#if IMU_ENABLE
+  void imu_loop(){
+    bot.imu_loop();
+  }
+#endif

@@ -4,7 +4,11 @@ Ticker botTicker;
 #if SERIAL_CONTROL
   Ticker serialTicker;
 #endif
-  
+
+#if IMU_ENABLE
+  Ticker IMUTicker;
+#endif
+
 #include "EncoderStepCounter.h"
 #include "Wheel_Controller.h"
 
@@ -41,7 +45,7 @@ class DomoBot : public Domo {
     int opto_distance = 300;
     
     #if IMU_ENABLE 
-      IMU mpu;
+      MPU6050 *mpu;
     #endif
     
     #if OPTO
@@ -66,7 +70,7 @@ class DomoBot : public Domo {
       attachInterrupt(EncoderPin_D, LeftInterrupt , CHANGE);
       
       #if IMU_ENABLE 
-        mpu.initIMU();
+        initIMU();
       #endif
 
       #if OPTO
@@ -77,10 +81,6 @@ class DomoBot : public Domo {
 
     void loop(){
       (this->*controller)();
-      
-      #if IMU_ENABLE 
-        mpu.updateIMU();
-      #endif
     }
     
     #if OPTO
@@ -88,7 +88,12 @@ class DomoBot : public Domo {
             OPT = &opto;
         }
     #endif
-    
+
+    #if IMU_ENABLE 
+        void setIMU( MPU6050 &imu ){
+            mpu = &imu;
+        }
+    #endif
     void idle(){
       if( millis() - run_millis >= this->currentStatus.latency ){
         run_millis = millis();
@@ -260,5 +265,8 @@ class DomoBot : public Domo {
             DUMPLN(" - Left Encoder: ", leftPos);
           #endif
         }
+    }
+    void imu_loop(){
+      IMU_Debug();
     }
 };
